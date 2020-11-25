@@ -1,0 +1,76 @@
+{
+  "twodder": {
+    "dev": {
+      "bot": {
+        "consumer": {
+          "key": "bot account consumer key",
+          "secret": "bot account consumer secret key"
+        },
+        "access": {
+          "key": "bot account access key",
+          "secret": "bot account access secret key"
+        }
+      },
+      "main": {
+        "consumer": {
+          "key": "main account consumer key",
+          "secret": "main account consumer secret key"
+        },
+        "access": {
+          "key": "main account access key",
+          "secret": "main account access secret key"
+        }
+      }
+    },
+    "prod": {
+      "bot": {
+        "consumer": {
+          "key": "bot account consumer key",
+          "secret": "bot account consumer secret key"
+        },
+        "access": {
+          "key": "bot account access key",
+          "secret": "bot account access secret key"
+        }
+      },
+      "main": {
+        "consumer": {
+          "key": "main account consumer key",
+          "secret": "main account consumer secret key"
+        },
+        "access": {
+          "key": "main account access key",
+          "secret": "main account access secret key"
+        }
+      }
+    }
+  },
+  "twitch":{
+    "client": {
+      "id": "client id"
+    },
+    "chatbot": {
+      "username": "username",
+      "password": "oauth pass",
+      "default_channel": "def"
+    }
+  },
+  "spotify": {
+    "dev": {
+      "client": {
+        "id": "client id",
+        "secret": "client secret"
+      }
+    },
+    "prod": {
+      "client": {
+        "id": "client id",
+        "secret": "client secret"
+      }
+    },
+    "default_user": "def user"
+  },
+  "ip_info": {
+    "prod_ip": "prod id"
+  }
+}

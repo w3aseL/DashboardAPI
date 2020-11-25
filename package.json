@@ -1,0 +1,42 @@
+{
+  "name": "twodder-bot-wsl",
+  "version": "0.0.1",
+  "description": "A Twitter bot for w3aseL!",
+  "main": "index.js",
+  "scripts": {
+    "fresh-install": "rm -r node_modules/ && sudo LZZ_COMPAT=1 npm install",
+    "start": "nodemon --exec babel-node index.js \"backend-port=3000 debug=true\"",
+    "prod": "babel-node index.js backend-port=8080",
+    "pm2": "pm2 start npm --no-automation --name \"dash-api\" -- run prod"
+  },
+  "keywords": [
+    "twodder"
+  ],
+  "author": "Noah Templet",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "minimist": "^1.2.5",
+    "node-cron": "^2.0.3",
+    "request": "^2.88.0",
+    "sequelize": "^6.3.5",
+    "spotify-web-api-node": "^4.0.0",
+    "sqlite3": "^5.0.0",
+    "tmi.js": "^1.5.0",
+    "twit": "^2.2.11",
+    "uuid": "^7.0.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.5"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "storage/twitter/*.json",
+      "storage/*.db"
+    ]
+  }
+}
