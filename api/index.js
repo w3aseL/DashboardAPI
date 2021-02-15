@@ -1,9 +1,11 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import cors from "cors"
 import { args } from '../helper/args'
 import { postTweet, getAllStats } from './twitter/index'
 import { APILogger, LogColors } from '../helper/logger'
-import { login, loginCallback, getUserData, getUserPlayback, getSessionState, trackPlaybackState, getAllStates, getAllSongs, getAllSessions } from './spotify'
+import { login, loginCallback, getUserData, getUserPlayback, getSessionState, trackPlaybackState, getAllStates, getSong, getSongs, getSession, getSessions } from './spotify'
+import { startAccountProcess, createAccount, loginAccount, verifyAccount, performAccessTokenRefresh } from './auth'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -29,6 +31,17 @@ const logger = (req, res, next) => {
   next()
 }
 
+var whitelist = [ 'https://spotify.noahtemplet.dev' ]
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
 class ServerAPI {
   constructor(port) {
     this.app = express()
@@ -37,6 +50,9 @@ class ServerAPI {
 
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
+
+    if(args.DEBUG)
+      this.app.use(cors(corsOptions))
   
     this.setupRoutes()
   
@@ -46,19 +62,25 @@ class ServerAPI {
   //Setup routes here for the API
   setupRoutes() {
     this.app.get('/', (req, res) => res.status(200).send('Hello, world!'));
-    this.app.post('/twitter/:acct/tweet', postTweet);
-    this.app.get('/twitter/:acct/statistics', getAllStats);
-    this.app.get('/spotify/login', login);
-    this.app.get('/spotify/auth', loginCallback);
-    this.app.get('/spotify/track-all', getAllStates);
-    this.app.get('/spotify/track-playback', trackPlaybackState);
-    this.app.get('/spotify/track-session', getSessionState);
-    this.app.get('/spotify/data/songs', getAllSongs);
-    this.app.get('/spotify/data/sessions', getAllSessions);
-    this.app.get('/spotify/me', getUserData);
-    this.app.get('/spotify/:user/me', getUserData);
-    this.app.get('/spotify/me/playback', getUserPlayback);
-    this.app.get('/spotify/:user/me/playback', getUserPlayback);
+    this.app.get('/auth/request-registration', startAccountProcess);
+    this.app.post('/auth/register', createAccount)
+    this.app.post('/auth/login', loginAccount)
+    this.app.post('/auth/refresh', performAccessTokenRefresh)
+    this.app.post('/twitter/:acct/tweet', verifyAccount, postTweet);
+    this.app.get('/twitter/:acct/statistics', verifyAccount, getAllStats);
+    this.app.get('/spotify/login', verifyAccount, login);
+    this.app.get('/spotify/auth', verifyAccount, loginCallback);
+    this.app.get('/spotify/track-all', verifyAccount, getAllStates);
+    this.app.get('/spotify/track-playback', verifyAccount, trackPlaybackState);
+    this.app.get('/spotify/track-session', verifyAccount, getSessionState);
+    this.app.get('/spotify/data/songs', verifyAccount, getSongs);
+    this.app.get('/spotify/data/song/:id', verifyAccount, getSong);
+    this.app.get('/spotify/data/sessions', verifyAccount, getSessions);
+    this.app.get('/spotify/data/session/:id', verifyAccount, getSession);
+    this.app.get('/spotify/me', verifyAccount, getUserData);
+    this.app.get('/spotify/:user/me', verifyAccount, getUserData);
+    this.app.get('/spotify/me/playback', verifyAccount, getUserPlayback);
+    this.app.get('/spotify/:user/me/playback', verifyAccount, getUserPlayback);
     this.app.get('*', (req, res, next) => res.status(404).send({ error: "Method does not exist!" }))
   }
 }

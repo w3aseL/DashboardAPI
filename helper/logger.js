@@ -89,4 +89,16 @@ export const TwitchLogger = {
   }
 }
 
+export const AccountLogger = {
+  log: (message) => {
+    console.log(`${colors.FgRed}[Account Manager] ${colors.Reset}${message}${colors.Reset}`)
+  },
+  info: (message) => {
+    console.log(`${colors.FgRed}[Account Manager] ${colors.FgYellow}${message}${colors.Reset}`)
+  },
+  error: (message) => {
+    console.log(`${colors.FgRed}[Account Manager] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+  }
+}
+
 export { colors as LogColors }

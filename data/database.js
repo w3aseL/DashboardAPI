@@ -240,4 +240,38 @@ TwitterStats.sync()
 
 twitterSQL.authenticate()
 
-export { spotifySQL, SpotifyAuth, twitterSQL, TwitterUser, TwitterStats, SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay }
+const userSQL = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "../storage", "user-db.sqlite"),
+  logging: (msg) => DBLogger.info(msg)
+})
+
+const User = userSQL.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  displayName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    field: "display_name"
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+}, {
+  createdAt: false,
+  updatedAt: false
+})
+
+User.sync()
+
+userSQL.authenticate()
+
+export { spotifySQL, SpotifyAuth, twitterSQL, TwitterUser, TwitterStats, SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay, User }

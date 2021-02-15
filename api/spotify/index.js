@@ -1,5 +1,5 @@
 import { getUserAPI, getPlaybackState, getActiveSession } from '../../bots/spotify/index'
-import { getStoredSongs, getStoredSessions } from "./data"
+import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession } from "./data"
 import keys from '../../keys.json'
 
 export const getUserData = (req, res, next) => {
@@ -52,26 +52,92 @@ export const getAllStates = (req, res, next) => {
   res.status(200).send({ ...getPlaybackState(), session: getActiveSession() })
 }
 
-export const getAllSongs = async (req, res, next) => {
-  try {
-    var songs = await getStoredSongs()
+export const getSong = async (req, res, next) => {
+  const { id } = req.params
 
-    res.status(200).send({ songs: songs })
-  } catch (err) {
+  if(!id) {
+    res.status(400).send({ message: "You must provide a song identifier!" })
+    return
+  }
+
+  try {
+    const song = await getStoredSong(id)
+
+    res.status(200).send(song)
+  } catch(err) {
     console.error(err)
-    res.status(500).send({ message: "An error occurred when retrieving the tokens for Spotify.", error: err })
+    res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
 }
 
-export const getAllSessions = async (req, res, next) => {
-  try {
-    var sessions = await getStoredSessions()
+export const getSongs = async (req, res, next) => {
+  var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 50
+  var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
+  var fullSongs = req.query.full_songs && req.query.full_songs === "false" ? false : true
+  const songUrl = `${req.protocol}://${req.headers.host}/spotify/data/song/`
+  const nextUrl = `${req.protocol}://${req.headers.host}/spotify/data/songs`
 
-    res.status(200).send({ sessions: sessions })
+  try {
+    var { songs, total_count } = await getStoredSongs(limit, offset, fullSongs, songUrl)
+
+    var returnData = {
+      songs
+    }
+
+    if(total_count-1 >= offset+limit)
+      returnData.next = `${nextUrl}?limit=${limit}&offset=${offset+limit}&full_songs=${fullSongs}`
+
+    res.status(200).send(returnData)
   } catch (err) {
     console.error(err)
-    res.status(500).send({ message: "An error occurred when retrieving the tokens for Spotify.", error: err })
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
+export const getSession = async (req, res, next) => {
+  const { id } = req.params
+
+  if(!id) {
+    res.status(400).send({ message: "You must provide a song identifier!" })
+    return
+  }
+
+  try {
+    const session = await getStoredSession(id)
+
+    res.status(200).send(session)
+  } catch(err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
+export const getSessions = async (req, res, next) => {
+  var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 10
+  var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
+  var songList = req.query.song_list && req.query.song_list === "true" ? true : false
+  var fullSongs = req.query.full_songs && req.query.full_songs === "false" ? false : true
+  const songUrl = `${req.protocol}://${req.headers.host}/spotify/data/song/`
+  const sessionUrl = `${req.protocol}://${req.headers.host}/spotify/data/session/`
+  const nextUrl = `${req.protocol}://${req.headers.host}/spotify/data/sessions`
+
+  try {
+    var { sessions, total_count } = await getStoredSessions(limit, offset, songList, fullSongs, songUrl, sessionUrl)
+
+    var returnData = {
+      sessions
+    }
+
+    if(total_count-1 >= offset+limit)
+      returnData.next = `${nextUrl}?limit=${limit}&offset=${offset+limit}&song_list=${songList}&full_songs=${fullSongs}`
+
+    res.status(200).send(returnData)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
 }
