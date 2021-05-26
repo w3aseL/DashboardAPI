@@ -52,7 +52,7 @@ class ServerAPI {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
 
-    if(args.DEBUG)
+    if(!args.DEBUG)
       this.app.use(cors(corsOptions))
   
     this.setupRoutes()
