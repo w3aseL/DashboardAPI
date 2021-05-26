@@ -75,14 +75,15 @@ export const getSongs = async (req, res, next) => {
   var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 50
   var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
   var fullSongs = req.query.full_songs && req.query.full_songs === "false" ? false : true
-  const songUrl = `${req.protocol}://${req.headers.host}/spotify/data/song/`
-  const nextUrl = `${req.protocol}://${req.headers.host}/spotify/data/songs`
+  const songUrl = `/spotify/data/song/`
+  const nextUrl = `/spotify/data/songs`
 
   try {
     var { songs, total_count } = await getStoredSongs(limit, offset, fullSongs, songUrl)
 
     var returnData = {
-      songs
+      songs,
+      total_count
     }
 
     if(total_count-1 >= offset+limit)
@@ -120,15 +121,16 @@ export const getSessions = async (req, res, next) => {
   var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
   var songList = req.query.song_list && req.query.song_list === "true" ? true : false
   var fullSongs = req.query.full_songs && req.query.full_songs === "false" ? false : true
-  const songUrl = `${req.protocol}://${req.headers.host}/spotify/data/song/`
-  const sessionUrl = `${req.protocol}://${req.headers.host}/spotify/data/session/`
-  const nextUrl = `${req.protocol}://${req.headers.host}/spotify/data/sessions`
+  const songUrl = `/spotify/data/song/`
+  const sessionUrl = `/spotify/data/session/`
+  const nextUrl = `/spotify/data/sessions`
 
   try {
     var { sessions, total_count } = await getStoredSessions(limit, offset, songList, fullSongs, songUrl, sessionUrl)
 
     var returnData = {
-      sessions
+      sessions,
+      total_count
     }
 
     if(total_count-1 >= offset+limit)

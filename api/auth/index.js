@@ -31,7 +31,7 @@ export const startAccountProcess = async (req, res, next) => {
 
   AccountLogger.log(`Your password to start the account process is: ${newPassword}`);
 
-  res.status(203).send();
+  res.status(200).send({ message: "Account request process has been started!" });
 }
 
 export const createAccount = async (req, res, next) => {
@@ -120,7 +120,7 @@ export const loginAccount = async (req, res, next) => {
 
       const tokens = createTokenSet(user.id)
       
-      res.status(200).send({ ...tokens })
+      res.status(200).send({ tokens: { ...tokens }, user: { username: user.username, display_name: user.displayName } })
     })
   } catch(e) {
     res.status(500).send({ message: "An error occurred when checking the password provided!" })
@@ -172,5 +172,40 @@ export const performAccessTokenRefresh = async (req, res, next) => {
     res.status(401).send({ message: e.message })
     AccountLogger.error(e)
     return
+  }
+}
+
+export const updatePassword = async (req, res, next) => {
+  const { old_password, new_password } = req.body
+  const { id } = req.user
+
+  const user = await User.findOne({ where: { id } })
+
+  if(!user) {
+    res.status(400).send({ message: "There is no user with that username provided!" })
+    return
+  }
+
+  try {
+    checkPassword(old_password, user.password, isCorrect => {
+      if(!isCorrect) {
+        res.status(400).send({ message: "The password the user provided is not correct!" })
+        return
+      }
+      
+      hashPassword(new_password, async encrypted_password => {
+        try {
+          user.update({ password: encrypted_password })
+        } catch(e) {
+          res.status(400).send({ message: "Unable to update the password for that user!", error: e })
+          return
+        }
+    
+        res.status(200).send({ message: `Updated password for ${user.username}!` })
+      })
+    })
+  } catch(e) {
+    res.status(500).send({ message: "An error occurred when checking the password provided!" })
+    AccountLogger.error(e)
   }
 }
