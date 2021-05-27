@@ -72,5 +72,10 @@
   },
   "ip_info": {
     "prod_ip": "prod id"
+  },
+  "aws": {
+    "access": "access key",
+    "secret": "secret key",
+    "bucket": "bucket.link.name"
   }
 }

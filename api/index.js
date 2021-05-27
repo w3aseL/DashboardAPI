@@ -1,12 +1,18 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from "cors"
-import path from "path"
+//import path from "path"
+import fileUpload from "express-fileupload"
+
 import { args } from '../helper/args'
+
 import { postTweet, getAllStats } from './twitter/index'
 import { APILogger, LogColors } from '../helper/logger'
+
 import { login, loginCallback, getUserData, getUserPlayback, getSessionState, trackPlaybackState, getAllStates, getSong, getSongs, getSession, getSessions } from './spotify'
 import { startAccountProcess, createAccount, loginAccount, verifyAccount, performAccessTokenRefresh, updatePassword } from './auth'
+import { uploadImage, getCategories, createCategory, removeCategory, uploadToolLogo, createTool, getTools, deleteTool, getTool,
+  uploadResume, updateResumeCreationDate, getResumes, getAllEducation, getEducationById, createEducationObj, uploadSchoolLogo } from './portfolio'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -47,12 +53,16 @@ class ServerAPI {
   constructor(port) {
     this.app = express()
 
+    this.app.use(fileUpload({
+      createParentPath: true
+    }))
+
     this.app.use(logger)
 
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
 
-    if(!args.DEBUG)
+    if(args.DEBUG)
       this.app.use(cors(corsOptions))
   
     this.setupRoutes()
@@ -62,13 +72,18 @@ class ServerAPI {
 
   //Setup routes here for the API
   setupRoutes() {
+    // AUTH
     this.app.get('/auth/request-registration', startAccountProcess);
     this.app.post('/auth/register', createAccount)
     this.app.post('/auth/login', loginAccount)
     this.app.post('/auth/refresh', performAccessTokenRefresh)
     this.app.post('/auth/update-password', verifyAccount, updatePassword)
+
+    // TWITTER
     this.app.post('/twitter/:acct/tweet', verifyAccount, postTweet);
     this.app.get('/twitter/:acct/statistics', verifyAccount, getAllStats);
+
+    // SPOTIFY TRACKING
     this.app.get('/spotify/login', verifyAccount, login);
     this.app.get('/spotify/auth', verifyAccount, loginCallback);
     this.app.get('/spotify/track-all', verifyAccount, getAllStates);
@@ -82,6 +97,26 @@ class ServerAPI {
     this.app.get('/spotify/:user/me', verifyAccount, getUserData);
     this.app.get('/spotify/me/playback', verifyAccount, getUserPlayback);
     this.app.get('/spotify/:user/me/playback', verifyAccount, getUserPlayback);
+
+    // PORTFOLIO EDITING
+    //this.app.post('/portfolio/upload-image', verifyAccount, uploadImage);
+    this.app.get('/portfolio/category', verifyAccount, getCategories);
+    this.app.post('/portfolio/category', verifyAccount, createCategory);
+    this.app.delete('/portfolio/category', verifyAccount, removeCategory);
+    this.app.get('/portfolio/tool', verifyAccount, getTools);
+    this.app.post('/portfolio/tool', verifyAccount, createTool);
+    this.app.delete('/portfolio/tool', verifyAccount, deleteTool);
+    this.app.get('/portfolio/tool/:id', verifyAccount, getTool);
+    this.app.post('/portfolio/tool/upload-image', verifyAccount, uploadToolLogo);
+    this.app.get('/portfolio/resume', verifyAccount, getResumes);
+    this.app.post('/portfolio/resume', verifyAccount, uploadResume);
+    this.app.patch('/portfolio/resume/:id', verifyAccount, updateResumeCreationDate);
+    this.app.get('/portfolio/education', verifyAccount, getAllEducation);
+    this.app.post('/portfolio/education', verifyAccount, createEducationObj);
+    this.app.get('/portfolio/education/:id', verifyAccount, getEducationById);
+    this.app.post('/portfolio/education/upload-image', verifyAccount, uploadSchoolLogo);
+
+    // OTHER
     this.app.use(express.static('public'));
     this.app.get('*', (req, res, next) => res.status(404).send({ error: "Method does not exist!" }))
   }
