@@ -1,4 +1,4 @@
-import { args } from "./args";
+import { DEBUG } from "./args";
 
 //https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
 const colors = {
@@ -55,13 +55,13 @@ export const TwitterLogger = {
 
 export const DBLogger = {
   log: (message) => {
-    if(args['debug']) console.log(`${colors.FgGreen}[DB Manager] ${colors.Reset}${message}${colors.Reset}`)
+    if(DEBUG) console.log(`${colors.FgGreen}[DB Manager] ${colors.Reset}${message}${colors.Reset}`)
   },
   info: (message) => {
-    if(args['debug']) console.log(`${colors.FgGreen}[DB Manager] ${colors.FgYellow}${message}${colors.Reset}`)
+    if(DEBUG) console.log(`${colors.FgGreen}[DB Manager] ${colors.FgYellow}${message}${colors.Reset}`)
   },
   error: (message) => {
-    if(args['debug']) console.log(`${colors.FgGreen}[DB Manager] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    if(DEBUG) console.log(`${colors.FgGreen}[DB Manager] ${colors.FgRed}Error: ${message}${colors.Reset}`)
   }
 }
 

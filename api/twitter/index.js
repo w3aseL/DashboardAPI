@@ -1,8 +1,11 @@
+import { Router } from "express"
+
+import { verifyAccount } from "../auth"
 import { botTwit, mainTwit } from '../../bots/twodder'
 import { APILogger, LogColors } from '../../helper/logger'
 import { TwitterStats } from '../../data/database'
 
-export const postTweet = async (req, res, next) => {
+const postTweet = async (req, res, next) => {
   const acct = req.params.acct
   const { tweet } = req.body
 
@@ -42,7 +45,7 @@ export const postTweet = async (req, res, next) => {
   return
 }
 
-export const getAllStats = async (req, res, next) => {
+const getAllStats = async (req, res, next) => {
   const acct = req.params.acct
 
   if(!acct && (acct != "main" || acct != "bot")) {
@@ -72,3 +75,10 @@ export const getAllStats = async (req, res, next) => {
 
   return
 }
+
+var twitterRouter = Router()
+
+twitterRouter.post('/:acct/tweet', verifyAccount, postTweet)
+twitterRouter.get('/:acct/statistics', verifyAccount, getAllStats)
+
+export { twitterRouter }

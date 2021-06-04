@@ -1,5 +1,6 @@
 import { uploadFile } from "../../data/s3"
 import { Image, Education } from "../../data/database"
+import { DEV_FOLDER } from "./index"
 
 const SITE_URL = "https://content.noahtemplet.dev/"
 
@@ -13,7 +14,7 @@ export const getAllEducation = async (req, res, next) => {
   var educationArr = []
 
   for(let i = 0; i < education.length; i++) {
-    var obj = education[i], eduObj = { id: obj.id, school_name: obj.schoolName, school_type: obj.schoolType, graduation_reward: obj.rewardType, graduation_date: obj.graduationDate }
+    var obj = education[i], eduObj = { id: obj.id, school_name: obj.schoolName, school_type: obj.schoolType, graduation_reward: obj.rewardType, graduation_date: obj.graduationDate, gpa: obj.gpa }
 
     const logo = await obj.getImage()
 
@@ -47,7 +48,7 @@ export const getEducationById = async (req, res, next) => {
     return
   }
 
-  var eduObj = { id: edu.id, school_name: edu.schoolName, school_type: edu.schoolType, graduation_reward: edu.rewardType, graduation_date: edu.graduationDate }
+  var eduObj = { id: edu.id, school_name: edu.schoolName, school_type: edu.schoolType, graduation_reward: edu.rewardType, graduation_date: edu.graduationDate, gpa: edu.gpa }
 
   const logo = await edu.getImage()
 
@@ -57,21 +58,23 @@ export const getEducationById = async (req, res, next) => {
   if(edu.major)
     eduObj.major = edu.major
 
-  if(logo)
+  if(logo) {
     eduObj.school_logo = logo.url
+    eduObj.logo_id = logo.id
+  }
 
     res.status(200).send({ ...eduObj })
 }
 
 export const createEducationObj = async (req, res, next) => {
-  const { school_name, school_type, graduation_reward, major, graduation_date, logo_id } = req.body
+  const { school_name, school_type, graduation_reward, major, graduation_date, logo_id, gpa } = req.body
 
-  if(!school_name || !school_type || !graduation_reward || !graduation_date) {
+  if(!school_name || !school_type || !graduation_reward || !graduation_date || !gpa) {
     res.status(400).send({ message: "Some fields are missing to create an Education object!" })
     return
   }
 
-  var obj = { schoolName: school_name, schoolType: school_type, rewardType: graduation_reward, graduationDate: new Date(graduation_date) }
+  var obj = { schoolName: school_name, schoolType: school_type, rewardType: graduation_reward, graduationDate: new Date(graduation_date), gpa }
 
   if(major) {
     obj.major = major
@@ -106,15 +109,17 @@ export const uploadSchoolLogo = async (req, res, next) => {
     return
   }
 
-  const folder = `education/logo`, url = `${SITE_URL}${folder}/${logo.name}`
+  const folder = `${DEV_FOLDER}education/logo`, url = `${SITE_URL}${folder}/${logo.name}`
 
   uploadFile(folder, logo.name, logo.data)
   .then(async isUploaded => {
-    const image = await Image.create({ fileName: logo.name, url })
+    const image = await Image.create({ fileName: logo.name, url, key: `${folder}/${logo.name}` })
 
     res.status(201).send({ message: "The logo has been successfully uploaded!", id: image.id, url: image.url })
   })
   .catch(err => {
     res.status(500).send({ message: "An error occurred when uploading the file to the S3 bucket!", err })
   })
-} 
+}
+
+// TODO: Write delete

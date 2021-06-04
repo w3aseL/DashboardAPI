@@ -2,9 +2,9 @@ import SpotifyWebApi from 'spotify-web-api-node'
 import { SpotifyLogger, LogColors } from '../../helper/logger'
 import { SpotifyAuth } from '../../data/database'
 import keys from '../../keys.json'
-import { args } from "../../helper/args";
+import { DEBUG } from "../../helper/args";
 
-export const keyLoc = (args['debug'] && args['debug'] == "true") ? keys.spotify.dev : keys.spotify.prod
+export const keyLoc = DEBUG ? keys.spotify.dev : keys.spotify.prod
 
 var userApis = []
 

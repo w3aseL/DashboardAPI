@@ -11,5 +11,6 @@ function setupArgs() {
   return args
 }
 
-export const args = setupArgs()
-export const DEBUG = args['debug']
+const args = setupArgs()
+export const API_PORT = args['backend-port'] ? parseInt(args['backend-port']) : 3000
+export const DEBUG = args['debug'] ? args['debug'] === "true" : false

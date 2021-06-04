@@ -24,3 +24,18 @@ export const uploadFile = async (folder, name, data) => {
     })
   })
 }
+
+export const deleteFile = async (fileKey) => {
+  const params = {
+    Bucket: keys.aws.bucket,
+    Key: fileKey
+  }
+
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(params, (err, data) => {
+      if(err) reject(err)
+
+      resolve(true)
+    })
+  })
+}

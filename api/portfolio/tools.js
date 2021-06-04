@@ -1,6 +1,8 @@
 import { uploadFile } from "../../data/s3"
 import { Category, Tool, Image } from "../../data/database"
 
+import { DEV_FOLDER } from "./index"
+
 const SITE_URL = "https://content.noahtemplet.dev/"
 
 /****************************/
@@ -20,11 +22,11 @@ export const uploadToolLogo = async (req, res, next) => {
     return
   }
 
-  const folder = `tools/logos`, url = `${SITE_URL}${folder}/${logo.name}`
+  const folder = `${DEV_FOLDER}tools/logos`, url = `${SITE_URL}${folder}/${logo.name}`
 
   uploadFile(folder, logo.name, logo.data)
   .then(async isUploaded => {
-    const image = await Image.create({ fileName: logo.name, url })
+    const image = await Image.create({ fileName: logo.name, url, key: `${folder}/${logo.name}` })
 
     res.status(201).send({ message: "The tool image has been successfully uploaded!", id: image.id, url: image.url })
   })

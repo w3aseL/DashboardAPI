@@ -2,8 +2,8 @@ import { api } from "./api/index.js"
 import cron from "node-cron"
 
 import { followReport, checkIfLive } from "./tasks/index"
-import { args } from './helper/args'
-import { SpotifyLogger, TwitterLogger } from './helper/logger'
+import { DEBUG } from './helper/args'
+import { SpotifyLogger, TwitterLogger, APILogger } from './helper/logger'
 import { mainDB } from './data/database'
 import { client as chatbot } from './bots/chat/index'
 
@@ -19,6 +19,13 @@ function init() {
   setupUserAPIs()
 
   cron.schedule('* * * * *', () => checkIfLive())
+
+  if(DEBUG) {
+    APILogger.info("API is in local developer mode!!!")
+    cron.schedule('*/30 * * * *', () => {
+      APILogger.info("API is in local developer mode!!!")
+    })
+  }
 
   cron.schedule('0 0 * * *', () => {
     TwitterLogger.info('Generating follow report!')

@@ -332,6 +332,10 @@ const Image = portfolioSQL.define('Image', {
       return str
     }
   },
+  key: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   fileName: { 
     type: DataTypes.STRING,
     allowNull: false,
@@ -388,6 +392,10 @@ const Education = portfolioSQL.define('Education', {
     type: DataTypes.DATEONLY,
     allowNull: false,
     field: "graduation_date"
+  },
+  gpa: {
+    type: DataTypes.DECIMAL(2),
+    allowNull: false
   }
 }, {
   createdAt: false,
@@ -513,6 +521,10 @@ const Resume = portfolioSQL.define('Resume', {
     field: "file_name"
   },
   url: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  key: {
     type: DataTypes.STRING,
     allowNull: false
   },

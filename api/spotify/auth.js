@@ -1,11 +1,13 @@
 import { spotifyAPI, registerUser } from '../../bots/spotify/index'
-import { args } from '../../helper/args'
+import { DEBUG, API_PORT } from '../../helper/args'
 import keys from '../../keys.json'
 import { v4 as uuid } from 'uuid'
 
 var scopes = ['user-read-email', 'user-read-playback-state', 'user-read-playback-position', 'user-read-currently-playing', 'user-read-recently-played', 'user-top-read']
 
-spotifyAPI.setRedirectURI(`http://${(args['debug'] && args['debug'] == "true" ? "localhost" : keys.ip_info.prod_ip)}:${args['backend-port']}/spotify/auth`)
+const REDIRECT_URI = DEBUG ? `http://localhost:${API_PORT}` : `https://${keys.ip_info.prod_ip}`
+
+spotifyAPI.setRedirectURI(`http://${REDIRECT_URI}/spotify/auth`)
 
 var openStates = []
 

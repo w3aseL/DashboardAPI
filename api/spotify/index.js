@@ -1,8 +1,13 @@
+import { Router } from "express"
+
+import { verifyAccount } from "../auth"
+
 import { getUserAPI, getPlaybackState, getActiveSession } from '../../bots/spotify/index'
 import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession } from "./data"
 import keys from '../../keys.json'
+import { login, loginCallback } from "./auth"
 
-export const getUserData = (req, res, next) => {
+const getUserData = (req, res, next) => {
   const user = (req.params != {} && req.params.user) ? req.params.user : keys.spotify.default_user
 
   const API = getUserAPI(user)
@@ -21,7 +26,7 @@ export const getUserData = (req, res, next) => {
   })
 }
 
-export const getUserPlayback = (req, res, next) => {
+const getUserPlayback = (req, res, next) => {
   const user = (req.params != {} && req.params.user) ? req.params.user : keys.spotify.default_user
 
   const API = getUserAPI(user)
@@ -40,19 +45,19 @@ export const getUserPlayback = (req, res, next) => {
   })
 }
 
-export const trackPlaybackState = (req, res, next) => {
+const trackPlaybackState = (req, res, next) => {
   res.status(200).send({ ...getPlaybackState() })
 }
 
-export const getSessionState = (req, res, next) => {
+const getSessionState = (req, res, next) => {
   res.status(200).send({ ...getActiveSession() })
 }
 
-export const getAllStates = (req, res, next) => {
+const getAllStates = (req, res, next) => {
   res.status(200).send({ ...getPlaybackState(), session: getActiveSession() })
 }
 
-export const getSong = async (req, res, next) => {
+const getSong = async (req, res, next) => {
   const { id } = req.params
 
   if(!id) {
@@ -71,7 +76,7 @@ export const getSong = async (req, res, next) => {
   }
 }
 
-export const getSongs = async (req, res, next) => {
+const getSongs = async (req, res, next) => {
   var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 50
   var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
   var fullSongs = req.query.full_songs && req.query.full_songs === "false" ? false : true
@@ -97,7 +102,7 @@ export const getSongs = async (req, res, next) => {
   }
 }
 
-export const getSession = async (req, res, next) => {
+const getSession = async (req, res, next) => {
   const { id } = req.params
 
   if(!id) {
@@ -116,7 +121,7 @@ export const getSession = async (req, res, next) => {
   }
 }
 
-export const getSessions = async (req, res, next) => {
+const getSessions = async (req, res, next) => {
   var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 10
   var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
   var songList = req.query.song_list && req.query.song_list === "true" ? true : false
@@ -144,4 +149,20 @@ export const getSessions = async (req, res, next) => {
   }
 }
 
-export * from './auth'
+var spotifyRouter = Router()
+
+spotifyRouter.get('/login', verifyAccount, login);
+spotifyRouter.get('/auth', verifyAccount, loginCallback);
+spotifyRouter.get('/track-all', verifyAccount, getAllStates)
+spotifyRouter.get('/track-playback', verifyAccount, trackPlaybackState)
+spotifyRouter.get('/track-session', verifyAccount, getSessionState)
+spotifyRouter.get('/data/songs', verifyAccount, getSongs)
+spotifyRouter.get('/data/song/:id', verifyAccount, getSong)
+spotifyRouter.get('/data/sessions', verifyAccount, getSessions)
+spotifyRouter.get('/data/session/:id', verifyAccount, getSession)
+spotifyRouter.get('/me', verifyAccount, getUserData)
+spotifyRouter.get('/:user/me', verifyAccount, getUserData)
+spotifyRouter.get('/me/playback', verifyAccount, getUserPlayback)
+spotifyRouter.get('/:user/me/playback', verifyAccount, getUserPlayback)
+
+export { spotifyRouter }

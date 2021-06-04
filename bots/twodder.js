@@ -1,6 +1,6 @@
 import Twit from "twit"
 import keys from "../keys.json"
-import { args } from "../helper/args";
+import { DEBUG } from "../helper/args";
 import { TwitterLogger } from "../helper/logger"
 import { TwitterUser } from "../data/database"
 
@@ -85,7 +85,7 @@ class TwodderBot {
   }
 }
 
-const keyLoc = (args['debug'] && args['debug'] == "true") ? keys.twodder.dev : keys.twodder.prod
+const keyLoc = DEBUG ? keys.twodder.dev : keys.twodder.prod
 
 const botTwit = new TwodderBot(keyLoc.bot)
 const mainTwit = new TwodderBot(keyLoc.main)

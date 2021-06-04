@@ -3,16 +3,16 @@ import bodyParser from 'body-parser'
 import cors from "cors"
 //import path from "path"
 import fileUpload from "express-fileupload"
+import helmet from "helmet"
 
-import { args } from '../helper/args'
+import { DEBUG, API_PORT } from '../helper/args'
 
-import { postTweet, getAllStats } from './twitter/index'
 import { APILogger, LogColors } from '../helper/logger'
 
-import { login, loginCallback, getUserData, getUserPlayback, getSessionState, trackPlaybackState, getAllStates, getSong, getSongs, getSession, getSessions } from './spotify'
-import { startAccountProcess, createAccount, loginAccount, verifyAccount, performAccessTokenRefresh, updatePassword } from './auth'
-import { uploadImage, getCategories, createCategory, removeCategory, uploadToolLogo, createTool, getTools, deleteTool, getTool,
-  uploadResume, updateResumeCreationDate, getResumes, getAllEducation, getEducationById, createEducationObj, uploadSchoolLogo } from './portfolio'
+import { spotifyRouter } from './spotify'
+import { twitterRouter } from './twitter'
+import { authRouter } from './auth'
+import { portfolioRouter } from './portfolio'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -31,7 +31,7 @@ const logger = (req, res, next) => {
       else return LogColors.FgMagenta
     }
 
-    APILogger.info(`${LogColors.FgBlue}${timeStr} ${LogColors.FgWhite}-- ${LogColors.FgYellow}${req.method} ${LogColors.FgCyan}${req.url} ${getColorFromCode(res.statusCode)}${res.statusCode}`)
+    APILogger.info(`${LogColors.FgBlue}${timeStr} ${LogColors.FgWhite}-- ${LogColors.FgYellow}${req.method} ${LogColors.FgCyan}${req.originalUrl} ${getColorFromCode(res.statusCode)}${res.statusCode}`)
   }
 
   res.on('finish', log)
@@ -62,8 +62,10 @@ class ServerAPI {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
 
-    if(args.DEBUG)
+    if(!DEBUG) {
       this.app.use(cors(corsOptions))
+      this.app.use(helmet())
+    }
   
     this.setupRoutes()
   
@@ -73,48 +75,16 @@ class ServerAPI {
   //Setup routes here for the API
   setupRoutes() {
     // AUTH
-    this.app.get('/auth/request-registration', startAccountProcess);
-    this.app.post('/auth/register', createAccount)
-    this.app.post('/auth/login', loginAccount)
-    this.app.post('/auth/refresh', performAccessTokenRefresh)
-    this.app.post('/auth/update-password', verifyAccount, updatePassword)
+    this.app.use('/auth', authRouter)
 
     // TWITTER
-    this.app.post('/twitter/:acct/tweet', verifyAccount, postTweet);
-    this.app.get('/twitter/:acct/statistics', verifyAccount, getAllStats);
+    this.app.use('/twitter', twitterRouter)
 
     // SPOTIFY TRACKING
-    this.app.get('/spotify/login', verifyAccount, login);
-    this.app.get('/spotify/auth', verifyAccount, loginCallback);
-    this.app.get('/spotify/track-all', verifyAccount, getAllStates);
-    this.app.get('/spotify/track-playback', verifyAccount, trackPlaybackState);
-    this.app.get('/spotify/track-session', verifyAccount, getSessionState);
-    this.app.get('/spotify/data/songs', verifyAccount, getSongs);
-    this.app.get('/spotify/data/song/:id', verifyAccount, getSong);
-    this.app.get('/spotify/data/sessions', verifyAccount, getSessions);
-    this.app.get('/spotify/data/session/:id', verifyAccount, getSession);
-    this.app.get('/spotify/me', verifyAccount, getUserData);
-    this.app.get('/spotify/:user/me', verifyAccount, getUserData);
-    this.app.get('/spotify/me/playback', verifyAccount, getUserPlayback);
-    this.app.get('/spotify/:user/me/playback', verifyAccount, getUserPlayback);
+    this.app.use('/spotify', spotifyRouter)
 
     // PORTFOLIO EDITING
-    //this.app.post('/portfolio/upload-image', verifyAccount, uploadImage);
-    this.app.get('/portfolio/category', verifyAccount, getCategories);
-    this.app.post('/portfolio/category', verifyAccount, createCategory);
-    this.app.delete('/portfolio/category', verifyAccount, removeCategory);
-    this.app.get('/portfolio/tool', verifyAccount, getTools);
-    this.app.post('/portfolio/tool', verifyAccount, createTool);
-    this.app.delete('/portfolio/tool', verifyAccount, deleteTool);
-    this.app.get('/portfolio/tool/:id', verifyAccount, getTool);
-    this.app.post('/portfolio/tool/upload-image', verifyAccount, uploadToolLogo);
-    this.app.get('/portfolio/resume', verifyAccount, getResumes);
-    this.app.post('/portfolio/resume', verifyAccount, uploadResume);
-    this.app.patch('/portfolio/resume/:id', verifyAccount, updateResumeCreationDate);
-    this.app.get('/portfolio/education', verifyAccount, getAllEducation);
-    this.app.post('/portfolio/education', verifyAccount, createEducationObj);
-    this.app.get('/portfolio/education/:id', verifyAccount, getEducationById);
-    this.app.post('/portfolio/education/upload-image', verifyAccount, uploadSchoolLogo);
+    this.app.use('/portfolio', portfolioRouter)
 
     // OTHER
     this.app.use(express.static('public'));
@@ -122,8 +92,6 @@ class ServerAPI {
   }
 }
 
-const backendPort = args['backend-port'] ? parseInt(args['backend-port']) : 3000
-
-const api = new ServerAPI(backendPort)
+const api = new ServerAPI(API_PORT)
 
 export { api }

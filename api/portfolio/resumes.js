@@ -1,5 +1,6 @@
-import { uploadFile } from "../../data/s3"
+import { uploadFile, deleteFile } from "../../data/s3"
 import { Resume } from "../../data/database"
+import { DEV_FOLDER } from "./index"
 
 const SITE_URL = "https://content.noahtemplet.dev/"
 
@@ -20,11 +21,11 @@ export const uploadResume = async (req, res, next) => {
     return
   }
 
-  const folder = `resumes`, url = `${SITE_URL}${folder}/${resume.name}`
+  const folder = `${DEV_FOLDER}resumes`, url = `${SITE_URL}${folder}/${resume.name}`
 
   uploadFile(folder, resume.name, resume.data)
   .then(async isUploaded => {
-    const newResume = await Resume.create({ fileName: resume.name, url, creationDate: new Date() })
+    const newResume = await Resume.create({ fileName: resume.name, url, creationDate: new Date(), key: `${folder}/${resume.name}` })
 
     res.status(201).send({ message: "The resume has been successfully uploaded!", id: newResume.id, url: newResume.url })
   })
@@ -65,8 +66,35 @@ export const getResumes = async (req, res, next) => {
   var resumes = []
 
   resumeObjs.forEach(resume => {
-    resumes.push({ url: resume.url, creationDate: resume.creationDate })
+    resumes.push({ url: resume.url, creation_date: resume.creationDate, file_name: resume.fileName, id: resume.id })
   })
 
   res.status(200).send({ resumes })
+}
+
+export const deleteResume = async (req, res, next) => {
+  const { id } = req.body
+
+  if(!id) {
+    res.status(400).send({ message: "A valid identifier was not provided!" })
+    return
+  }
+
+  const resume = await Resume.findOne({ where: { id }})
+
+  if(!resume) {
+    res.status(400).send({ message: "A resume does not exist with that identifier!" })
+    return
+  }
+
+  deleteFile(resume.key)
+  .then(async _ => {
+    await resume.destroy()
+
+    res.status(200).send({ message: "Successfully deleted resume!" })
+  })
+  .catch(err => {
+    res.status(500).send({ message: "An error has occurred when deleting the resume!", error: err })
+    return
+  })
 }

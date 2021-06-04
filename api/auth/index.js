@@ -1,7 +1,9 @@
+import cron from "node-cron"
+import { Router } from "express"
+
 import { User } from "../../data/database"
 import { createTokenSet, refreshAccessToken, verifyAccessToken } from "../../auth/token"
 import { generateRandomString, hashPassword, checkPassword } from "../../auth/hash"
-import cron from "node-cron"
 import { AccountLogger } from "../../helper/logger"
 
 var authData = { 
@@ -22,7 +24,7 @@ const tickPasswordExpiration = () => {
 
 cron.schedule('* * * * *', () => tickPasswordExpiration())
 
-export const startAccountProcess = async (req, res, next) => {
+const startAccountProcess = async (req, res, next) => {
   var newPassword = generateRandomString(15)
 
   hashPassword(newPassword, hashedPW => {
@@ -34,7 +36,7 @@ export const startAccountProcess = async (req, res, next) => {
   res.status(200).send({ message: "Account request process has been started!" });
 }
 
-export const createAccount = async (req, res, next) => {
+const createAccount = async (req, res, next) => {
   const { register_password, display_name, username, password } = req.body
 
   if(!register_password) {
@@ -96,7 +98,7 @@ export const createAccount = async (req, res, next) => {
     res.status(400).send({ message: "Unable to verify the password provided!" })
 }
 
-export const loginAccount = async (req, res, next) => {
+const loginAccount = async (req, res, next) => {
   const { username, password } = req.body
 
   if(!username || !password) {
@@ -128,7 +130,7 @@ export const loginAccount = async (req, res, next) => {
   }
 }
 
-export const verifyAccount = async (req, res, next) => {
+const verifyAccount = async (req, res, next) => {
   const authHeader = req.header('Authorization')
 
   if(!authHeader) {
@@ -161,7 +163,7 @@ export const verifyAccount = async (req, res, next) => {
   }
 }
 
-export const performAccessTokenRefresh = async (req, res, next) => {
+const performAccessTokenRefresh = async (req, res, next) => {
   const { refresh_token } = req.body
 
   try {
@@ -175,7 +177,7 @@ export const performAccessTokenRefresh = async (req, res, next) => {
   }
 }
 
-export const updatePassword = async (req, res, next) => {
+const updatePassword = async (req, res, next) => {
   const { old_password, new_password } = req.body
   const { id } = req.user
 
@@ -209,3 +211,13 @@ export const updatePassword = async (req, res, next) => {
     AccountLogger.error(e)
   }
 }
+
+var authRouter = Router()
+
+authRouter.get('/request-registration', startAccountProcess);
+authRouter.post('/register', createAccount)
+authRouter.post('/login', loginAccount)
+authRouter.post('/refresh', performAccessTokenRefresh)
+authRouter.post('/update-password', verifyAccount, updatePassword)
+
+export { authRouter, verifyAccount }
