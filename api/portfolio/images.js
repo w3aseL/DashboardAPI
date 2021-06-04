@@ -5,7 +5,7 @@ import { DEV_FOLDER } from "./index"
 const SITE_URL = "https://content.noahtemplet.dev/"
 
 /****************************/
-/*         PROJECTS         */
+/*          IMAGES          */
 /****************************/
 
 export const getAllImages = async (req, res, next) => {
