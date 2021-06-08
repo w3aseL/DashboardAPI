@@ -66,7 +66,7 @@ export const createTool = async (req, res, next) => {
   if(category) {
     var categoryObj = await Category.findOne({ where: { name: category } })
 
-    if(!category) {
+    if(!categoryObj) {
       categoryObj = await Category.create({ name: category })
     }
 
@@ -123,6 +123,7 @@ export const getTool = async (req, res, next) => {
 
   if(image) {
     toolObj.logo_url = image.url
+    toolObj.logo_id = image.id
   }
 
   if(category) {
@@ -130,6 +131,63 @@ export const getTool = async (req, res, next) => {
   }
 
   res.status(200).send({ ...toolObj })
+}
+
+export const updateTool = async (req, res, next) => {
+  const { id } = req.params
+  const { name, description, url, category, logo_id } = req.body
+
+  if(!id) {
+    res.status(400).send({ message: "A valid identifier was not provided!" })
+    return
+  }
+
+  const tool = await Tool.findOne({ where: { id } })
+
+  if(!tool) {
+    res.status(400).send({ message: "A tool with that id was not found!" })
+    return
+  }
+
+  const image = await tool.getImage(), categoryObj = await tool.getCategory()
+
+  var updateObj = {}
+
+  if(name || description || url || category || logo_id) {
+    if(logo_id && image && image.id != logo_id) {
+      const newImg = await Image.findOne({ where: { id: logo_id } })
+
+      await tool.setImage(newImg)
+    }
+
+    if(category && categoryObj && categoryObj.name != category) {
+      var newCategory = await Category.findOne({ where: { name: category } })
+
+      if(!newCategory) {
+        newCategory = await Category.create({ name: category })
+      }
+
+      await tool.setCategory(newCategory)
+    }
+
+    if(name && tool.name != name)
+      updateObj.name = name
+
+    if(description && tool.description != description)
+      updateObj.description = description
+
+    if(url && tool.url != url)
+      updateObj.url = url
+
+    if(updateObj !== {})
+      await tool.update(updateObj)
+
+    res.status(200).send({ message: `Updated tool with id ${id}!` })
+    return
+  } else {
+    res.status(400).send({ message: "No field is provided to perform an update!" })
+    return
+  }
 }
 
 export const deleteTool = async (req, res, next) => {
