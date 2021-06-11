@@ -122,4 +122,22 @@ export const uploadSchoolLogo = async (req, res, next) => {
   })
 }
 
-// TODO: Write delete
+export const deleteEducation = async (req, res, next) => {
+  const { id } = req.body
+
+  if(!id) {
+    res.status(400).send({ message: "A valid identifier was not provided!" })
+    return
+  }
+
+  const edu = await Education.findOne({ where: { id } })
+
+  if(!edu) {
+    res.status(400).send({ message: "A position was not found with that id!" })
+    return
+  }
+
+  await edu.destroy()
+
+  res.status(200).send({ message: "Deleted the education object!" })
+}

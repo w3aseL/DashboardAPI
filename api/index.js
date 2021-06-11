@@ -1,5 +1,4 @@
 import express from 'express'
-import bodyParser from 'body-parser'
 import cors from "cors"
 //import path from "path"
 import fileUpload from "express-fileupload"
@@ -59,8 +58,8 @@ class ServerAPI {
 
     this.app.use(logger)
 
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
 
     if(!DEBUG) {
       this.app.use(cors(corsOptions))

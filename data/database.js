@@ -455,7 +455,10 @@ const ProjectTool = portfolioSQL.define('ProjectTool', {}, {
 })
 
 Image.belongsToMany(Project, { through: ProjectImage, onDelete: "cascade", onUpdate: "cascade" })
+Project.belongsToMany(Image, { through: ProjectImage, onDelete: "cascade", onUpdate: "cascade" })
+
 Tool.belongsToMany(Project, { through: ProjectTool, onDelete: "cascade", onUpdate: "cascade" })
+Project.belongsToMany(Tool, { through: ProjectTool, onDelete: "cascade", onUpdate: "cascade" })
 
 const Position = portfolioSQL.define('Position', {
   id: {

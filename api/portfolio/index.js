@@ -8,13 +8,15 @@ import { verifyAccount } from "../auth"
 import { getCategories, createCategory, removeCategory } from "./categories"
 import { getTools, getTool, createTool, deleteTool, uploadToolLogo, updateTool } from "./tools"
 import { deleteResume, getResumes, updateResumeCreationDate, uploadResume } from "./resumes"
-import { createEducationObj, getAllEducation, getEducationById, uploadSchoolLogo } from "./education"
+import { createEducationObj, deleteEducation, getAllEducation, getEducationById, uploadSchoolLogo } from "./education"
 import { deleteImage, getAllImages, getImage } from "./images"
+import { createProject, deleteProject, getProjects, uploadProjectImage } from "./projects"
+import { createPosition, deletePosition, getPosition, getPositions, updatePosition, uploadCompanyLogo } from "./positions"
 
 export const SITE_URL = "https://content.noahtemplet.dev/", DEV_FOLDER = DEBUG ? "test-content/" : ""
 
 // USE AS REFERENCE
-export const uploadImage = async (req, res, next) => {
+const uploadImage = async (req, res, next) => {
   if(!req.files) {
     res.status(400).send({ message: "No image has been provided!" })
     return
@@ -126,6 +128,7 @@ portfolioRouter.patch('/resume/:id', verifyAccount, updateResumeCreationDate)
 portfolioRouter.route('/education')
   .get(verifyAccount, getAllEducation)
   .post(verifyAccount, createEducationObj)
+  .delete(verifyAccount, deleteEducation)
 
 portfolioRouter.get('/education/:id', verifyAccount, getEducationById)
 portfolioRouter.post('/education/upload-image', verifyAccount, uploadSchoolLogo)
@@ -135,5 +138,22 @@ portfolioRouter.route('/image')
   .delete(verifyAccount, deleteImage)
 
 portfolioRouter.get('/image/:id', verifyAccount, getImage)
+
+portfolioRouter.route('/project')
+  .get(verifyAccount, getProjects)
+  .post(verifyAccount, createProject)
+  .delete(verifyAccount, deleteProject)
+
+portfolioRouter.post('/project/upload-image', verifyAccount, uploadProjectImage)
+
+portfolioRouter.route('/position')
+  .get(verifyAccount, getPositions)
+  .post(verifyAccount, createPosition)
+  .delete(verifyAccount, deletePosition)
+
+portfolioRouter.post('/position/upload-image', verifyAccount, uploadCompanyLogo)
+portfolioRouter.route('/position/:id')
+  .get(verifyAccount, getPosition)
+  .patch(verifyAccount, updatePosition)
 
 export { portfolioRouter }
