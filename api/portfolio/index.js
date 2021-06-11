@@ -41,7 +41,7 @@ const uploadImage = async (req, res, next) => {
 const requestAllData = async (req, res, next) => {
   const tools = await Tool.findAll()
 
-  let toolList = {}, resumeList = [], educationList = []
+  let toolList = {}, resumeList = [], educationList = [], projectList = [], positionList = []
 
   const placeToolInCategory = (tool, category) => {
     if(!toolList[category])
@@ -65,24 +65,22 @@ const requestAllData = async (req, res, next) => {
       placeToolInCategory(toolObj, "Other")
   }
 
-  const educationObjs = await Education.findAll()
+  const educationObjs = await Education.findAll({ include: { model: Image, attributes: [ "url" ] } })
 
-  for(let i = 0; i < educationObjs.length; i++) {
-    var obj = educationObjs[i], eduObj = { school_name: obj.schoolName, school_type: obj.schoolType, graduation_reward: obj.rewardType, graduation_date: obj.graduationDate, gpa: obj.gpa }
+  educationObjs.forEach(edu => {
+    var eduObj = { school_name: edu.schoolName, school_type: edu.schoolType, graduation_reward: edu.rewardType, graduation_date: edu.graduationDate, gpa: edu.gpa }
 
-    const logo = await obj.getImage()
+    if(edu.schoolUrl)
+    eduObj.school_url = edu.schoolUrl
 
-    if(obj.schoolUrl)
-      eduObj.school_url = obj.schoolUrl
+  if(edu.major)
+    eduObj.major = edu.major
 
-    if(obj.major)
-      eduObj.major = obj.major
+  if(edu.Image)
+    eduObj.school_logo = edu.Image.url
 
-    if(logo)
-      eduObj.school_logo = logo.url
-
-    educationList.push(eduObj)
-  }
+  educationList.push(eduObj)
+  })
 
   const resumeObjs = await Resume.findAll()
 
@@ -90,10 +88,93 @@ const requestAllData = async (req, res, next) => {
     resumeList.push({ url: resume.url, creation_date: resume.creationDate })
   })
 
+  const projectObjs = await Project.findAll({
+    include: [
+      {
+        model: Image,
+        attributes: [ "url" ],
+        through: {
+          attributes: [ "is_logo" ] 
+        }
+      },
+      {
+        model: Tool,
+        attributes: [ "name", "description", "url" ],
+        include:  [
+          {
+            model: Image,
+            attributes: [ "url" ],
+          },
+          {
+            model: Category,
+            attributes: [ "name" ],
+          }
+        ]
+      }
+    ]
+  })
+
+  projectObjs.forEach(project => {
+    var projectObj = {
+      name: project.name,
+      description: project.description,
+      url: project.url,
+      repo_url: project.repoUrl,
+      images: [],
+      tools: []
+    }
+
+    project.Images.forEach(img => {
+      if(img.ProjectImage.dataValues.is_logo == 1)
+        projectObj.logo_url = img.url
+      else
+        projectObj.images.push(img.url) 
+    })
+
+    project.Tools.forEach(tool => {
+      var toolObj = { name: tool.name, url: tool.url }
+
+      if(tool.Image)
+        toolObj.logo_url = tool.Image.url
+
+      if(tool.Category)
+        toolObj.category = tool.Category.name
+
+      projectObj.tools.push(toolObj)
+    })
+
+    projectList.push(projectObj)
+  })
+
+  const positionObjs = await Position.findAll({
+    include: {
+      model: Image,
+      attributes: [ "url" ]
+    }
+  })
+
+  positionObjs.forEach(pos => {
+    var posObj = {
+      job_title: pos.jobTitle,
+      company_name: pos.companyName,
+      company_url: pos.companyUrl,
+      description: pos.description,
+      start_date: pos.startDate,
+      end_date: pos.endDate
+    }
+
+    if(pos.Image)
+      posObj.logo_url = pos.Image.url
+
+    positionList.push(posObj)
+  })
+
   res.status(200).send({
     tools: toolList,
     resumes: resumeList.sort((a, b) => new Date(b.creation_date) - new Date(a.creation_date)),
-    education: educationList
+    education: educationList,
+    projects: projectList,
+    positions: positionList
   })
 }
 
