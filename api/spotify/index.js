@@ -3,7 +3,7 @@ import { Router } from "express"
 import { verifyAccount } from "../auth"
 
 import { getUserAPI, getPlaybackState, getActiveSession } from '../../bots/spotify/index'
-import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession } from "./data"
+import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession, getAlbumsWithSongs, getAlbumsWithoutSongs, getStoredAlbum, getStoredAlbums } from "./data"
 import keys from '../../keys.json'
 import { login, loginCallback } from "./auth"
 
@@ -106,7 +106,7 @@ const getSession = async (req, res, next) => {
   const { id } = req.params
 
   if(!id) {
-    res.status(400).send({ message: "You must provide a song identifier!" })
+    res.status(400).send({ message: "You must provide a session identifier!" })
     return
   }
 
@@ -149,6 +149,52 @@ const getSessions = async (req, res, next) => {
   }
 }
 
+const getAlbum = async (req, res, next) => {
+  const { id } = req.params
+
+  if(!id) {
+    res.status(400).send({ message: "You must provide a album identifier!" })
+    return
+  }
+
+  try {
+    const album = await getStoredAlbum(id)
+
+    res.status(200).send(album)
+  } catch(err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
+const getAlbums = async (req, res, next) => {
+  var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 20
+  var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
+  var fullAlbum = req.query.full_album && req.query.full_album === "false" ? false : true
+  const songUrl = `/spotify/data/song/`
+  const albumUrl = `/spotify/data/album/`
+  const nextUrl = `/spotify/data/albums`
+
+  try {
+    var { albums, count } = await getStoredAlbums(limit, offset, fullAlbum, albumUrl, songUrl)
+
+    var returnData = {
+      albums,
+      total_count: count
+    }
+
+    if(count-1 >= offset+limit)
+      returnData.next = `${nextUrl}?limit=${limit}&offset=${offset+limit}&full_album=${fullAlbum}`
+
+    res.status(200).send(returnData)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
 var spotifyRouter = Router()
 
 spotifyRouter.get('/login', verifyAccount, login);
@@ -160,6 +206,8 @@ spotifyRouter.get('/data/songs', verifyAccount, getSongs)
 spotifyRouter.get('/data/song/:id', verifyAccount, getSong)
 spotifyRouter.get('/data/sessions', verifyAccount, getSessions)
 spotifyRouter.get('/data/session/:id', verifyAccount, getSession)
+spotifyRouter.get('/data/albums', verifyAccount, getAlbums)
+spotifyRouter.get('/data/album/:id', verifyAccount, getAlbum)
 spotifyRouter.get('/me', verifyAccount, getUserData)
 spotifyRouter.get('/:user/me', verifyAccount, getUserData)
 spotifyRouter.get('/me/playback', verifyAccount, getUserPlayback)

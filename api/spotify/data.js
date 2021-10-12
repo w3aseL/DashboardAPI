@@ -127,3 +127,53 @@ export const getStoredSessions = async (limit=10, id=0, songList=false, fullSong
 
   return { sessions: sessionData, total_count: sessionCount }
 }
+
+// 6ecx4OFG0nlUMqAi9OXQER S + M (D)
+export const getStoredAlbum = async (albumId) => {
+  const album = await SpotifyAlbum.findOne({ where: { id: albumId } })
+
+  if(!album) throw new Error(`Unable to find album with id ${albumId}!`)
+
+  const { id, title, url, artwork_url } = album
+
+  const songList = await album.getSongs(), artists = processArtists(await album.getArtists())
+
+  let songs = []
+
+  for(let i = 0; i < songList.length; i++) {
+    const { id, title, url } = songList[i]
+
+    songs.push({ id, title, url })
+  }
+
+  return { id, title, url, artwork_url, songs, artists }
+}
+
+export const getStoredAlbums = async (limit=20, id=0, fullAlbum=false, albumLink, songLink) => {
+  const albumCount = await SpotifyAlbum.count()
+  const albums = await SpotifyAlbum.findAll({ offset: id, limit })
+
+  let albumList = []
+
+  for(let i = 0; i < albums.length; i++) {
+    const { title, url, artwork_url } = albums[i]
+
+    const songList = await albums[i].getSongs(), artists = processArtists(await albums[i].getArtists())
+
+    if(fullAlbum) {
+      let songs = []
+
+      for(let i = 0; i < songList.length; i++) {
+        const { title, url } = songList[i]
+    
+        songs.push({ id: songList[i].id, title, url, more_info: `${songLink}${songList[i].id}` })
+      }
+
+      albumList.push({ id: albums[i].id, title, url, artwork_url, songs, artists })
+    } else {
+      albumList.push({ id: albums[i].id, title, url, artwork_url, song_count: songList.length, artists, more_info: `${albumLink}${albums[i].id}` })
+    }
+  }
+
+  return { albums: albumList, count: albumCount }
+}

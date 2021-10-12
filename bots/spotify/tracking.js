@@ -240,7 +240,17 @@ async function trackSession(sessionData) {
     let songPlayed = sessionData.song_list[i], artists = await getArtistModels(songPlayed.artists)
 
     // Find the song model
-    let songModel = await SpotifySong.findOne({ where: { title: songPlayed.name, id: songPlayed.id } })
+    let songModel = await SpotifySong.findOne({ where: { title: songPlayed.name, id: songPlayed.id }, include: [ { model: SpotifyArtist }, { model: SpotifyAlbum } ] })
+
+    // If is valid, and album isn't contained, assign one
+    if(songModel && songModel.Albums.length == 0) {
+      let albumModel = await SpotifyAlbum.findOne({ where: { title: songPlayed.album.name, id: songPlayed.album.id } })
+
+      if(!albumModel)
+        albumModel = await SpotifyAlbum.findOne({ where: { title: songPlayed.album.name, url: "local" } })
+
+      songModel.addAlbum(albumModel)
+    }
 
     // Check for local instances (with artists)
     if(!songModel)
@@ -278,9 +288,9 @@ async function trackSession(sessionData) {
         } else {
           albumModel.setArtists([ artists[0] ])
         }
-
-        songModel.addAlbum(albumModel)
       }
+      
+      songModel.addAlbum(albumModel)
     }
 
     const trackPlay = await SpotifyTrackPlay.create({ time_played: songPlayed.time_played })
@@ -313,4 +323,48 @@ async function getArtistModels(artistData) {
   }
 
   return artists
+}
+
+const RESET_LIMIT = 5
+
+export const fixMissingAlbumsIfAnyMissing = async () => {
+  const songs = await SpotifySong.findAll({
+    include: { model: SpotifyAlbum }
+  })
+
+  let count = 0, songsToFix = []
+
+  for(let i = 0; i < songs.length; i++) 
+    if(songs[i].Albums.length == 0 && songs[i].url !== "local") songsToFix.push(songs[i])
+
+  for(let i = 0; i < songsToFix.length; i++) {
+    let song = songsToFix[i]
+
+    if(count == RESET_LIMIT)
+      break;
+
+    if(song.Albums.length == 0) {
+      count++;
+
+      let res = await getUserAPI(defaultUsername).getTrack(song.id)
+
+      let albumModel = await SpotifyAlbum.findOne({ where: { id: res.body.album.id } })
+
+      if(!albumModel) {
+        SpotifyLogger.info(`Failed to find an available album for song "${song.tile}"`)
+      } else {
+        song.addAlbum(albumModel)
+      }
+    }
+  }
+
+  SpotifyLogger.info(`Fixed ${count} songs with albums!`)
+
+  if(songsToFix.length != 0) {
+    SpotifyLogger.info(`There are more songs to fix! Waiting 2 minutes to fix more songs...`)
+
+    setTimeout(() => {
+      fixMissingAlbumsIfAnyMissing()
+    }, 1000 * 120)
+  }
 }

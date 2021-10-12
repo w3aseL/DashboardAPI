@@ -7,7 +7,7 @@ import { SpotifyLogger, TwitterLogger, APILogger } from './helper/logger'
 import { mainDB } from './data/database'
 import { client as chatbot } from './bots/chat/index'
 
-import { setupUserAPIs, updateUserPlaybackState } from './bots/spotify/index'
+import { setupUserAPIs, updateUserPlaybackState, fixMissingAlbumsIfAnyMissing } from './bots/spotify/index'
 
 const SECOND_IN_MS = 1000
 
@@ -38,6 +38,11 @@ function init() {
       updateUserPlaybackState()
     })
   }, SECOND_IN_MS * 5)
+
+  setTimeout(() => {
+    SpotifyLogger.info("Fixing songs with missing albums.")
+    fixMissingAlbumsIfAnyMissing()
+  }, SECOND_IN_MS * 15)
 
   //chatbot.connect();
 }
