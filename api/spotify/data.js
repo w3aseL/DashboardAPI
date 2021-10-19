@@ -28,7 +28,7 @@ const processAlbums = albums => {
 }
 
 const getFullSongData = async song => {
-  var songData = { title: song.title, id: song.id, url: song.url }
+  var songData = { title: song.title, id: song.id, url: song.url, duration: song.duration }
 
   songData.artists = processArtists(await song.getArtists())
 
@@ -176,4 +176,79 @@ export const getStoredAlbums = async (limit=20, id=0, fullAlbum=false, albumLink
   }
 
   return { albums: albumList, count: albumCount }
+}
+
+export const countTimesListened = async id => {
+  const records = await SpotifyTrackPlay.findAll({
+    include: {
+      model: SpotifySong,
+      where: { id }
+    }
+  })
+
+  if(records.length == 0) {
+    throw new Error(`Failed to find a song played with id "${id}"!`)
+  }
+
+  const record = records[0], song = record.Song, fullSong = await getFullSongData(song)
+
+  var totalTimeListened = 0
+
+  for(let i = 0; i < records.length; i++) {
+    totalTimeListened += records[i].time_played
+  }
+
+  var data = { 
+    times_played: records.length,
+    total_time_listened: totalTimeListened,
+    ...fullSong
+  }
+
+  return data
+}
+
+export const countTimesListenedByArtist = async id => {
+  const songs = await SpotifySong.findAll({
+    attributes: [
+      'id'
+    ],
+    include: {
+      model: SpotifyArtist,
+      where: { id }
+    }
+  })
+
+  if(songs.length == 0) {
+    throw new Error(`Failed to find a song played by artist with id "${id}"!`)
+  }
+
+  const artist = songs[0].Artists[0]
+
+  console.log(artist)
+
+  var songIds = [], totalTimeListened = 0
+
+  songs.forEach(song => songIds.push(song.id))
+
+  const records = await SpotifyTrackPlay.findAll({
+    include: {
+      model: SpotifySong,
+      where: {
+        id: { [Sequelize.Op.in]: songIds }
+      }
+    }
+  })
+
+  records.forEach(play => totalTimeListened += play.time_played)
+
+  var data = {
+    id: artist.id,
+    name: artist.name,
+    url: artist.url,
+    songs_listened_to: songIds.length,
+    total_listens: records.length,
+    total_time: totalTimeListened
+  }
+
+  return data
 }

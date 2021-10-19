@@ -4,6 +4,8 @@ import { DEBUG } from "../helper/args";
 import { TwitterLogger } from "../helper/logger"
 import { TwitterUser } from "../data/database"
 
+const TWITTER_COLOR = "735243"    // Signature Weasel brown
+
 class TwodderBot {
   constructor(keys) {
     this.twodderAcct = new Twit({
@@ -66,6 +68,24 @@ class TwodderBot {
   async getUserInfo() {
     return new Promise((resolve, reject) => {
       this.twodderAcct.get('account/verify_credentials', (err, data, res) => {
+        if(err) reject(err)
+        else resolve(data)
+      })
+    })
+  }
+
+  async updateBio(bio) {
+    return new Promise((resolve, reject) => {
+      this.twodderAcct.post('account/update_profile', { description: bio }, (err, data, res) => {
+        if(err) reject(err)
+        else resolve(data)
+      })
+    })
+  }
+
+  async changeColor(color=TWITTER_COLOR) {
+    return new Promise((resolve, reject) => {
+      this.twodderAcct.post('account/update_profile', { profile_link_color: color }, (err, data, res) => {
         if(err) reject(err)
         else resolve(data)
       })

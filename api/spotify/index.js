@@ -2,8 +2,8 @@ import { Router } from "express"
 
 import { verifyAccount } from "../auth"
 
-import { getUserAPI, getPlaybackState, getActiveSession } from '../../bots/spotify/index'
-import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession, getAlbumsWithSongs, getAlbumsWithoutSongs, getStoredAlbum, getStoredAlbums } from "./data"
+import { getUserAPI, getPlaybackState, getActiveSession, getSimplePlayback } from '../../bots/spotify/index'
+import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession, getAlbumsWithSongs, getAlbumsWithoutSongs, getStoredAlbum, getStoredAlbums, countTimesListened, countTimesListenedByArtist } from "./data"
 import keys from '../../keys.json'
 import { login, loginCallback } from "./auth"
 
@@ -43,6 +43,10 @@ const getUserPlayback = (req, res, next) => {
   .catch(err => {
     res.status(500).send({ ...err })
   })
+}
+
+const trackSimplePlayback = (req, res, next) => {
+  res.status(200).send({ ...getSimplePlayback() })
 }
 
 const trackPlaybackState = (req, res, next) => {
@@ -195,10 +199,40 @@ const getAlbums = async (req, res, next) => {
   }
 }
 
+const getTimesListenedToSong = async (req, res, next) => {
+  const { id } = req.params
+
+  try {
+    const records = await countTimesListened(id)
+
+    res.status(200).send({ ...records })
+  } catch(err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
+const getTimesListenedToArtist = async (req, res, next) => {
+  const { id } = req.params
+
+  try {
+    const records = await countTimesListenedByArtist(id)
+
+    res.status(200).send({ ...records })
+  } catch(err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
 var spotifyRouter = Router()
 
-spotifyRouter.get('/login', verifyAccount, login);
-spotifyRouter.get('/auth', verifyAccount, loginCallback);
+spotifyRouter.get('/test/:id', getTimesListenedToArtist)
+spotifyRouter.get('/playback', trackSimplePlayback)
+spotifyRouter.get('/login', verifyAccount, login)
+spotifyRouter.get('/auth', verifyAccount, loginCallback)
 spotifyRouter.get('/track-all', verifyAccount, getAllStates)
 spotifyRouter.get('/track-playback', verifyAccount, trackPlaybackState)
 spotifyRouter.get('/track-session', verifyAccount, getSessionState)
@@ -208,6 +242,7 @@ spotifyRouter.get('/data/sessions', verifyAccount, getSessions)
 spotifyRouter.get('/data/session/:id', verifyAccount, getSession)
 spotifyRouter.get('/data/albums', verifyAccount, getAlbums)
 spotifyRouter.get('/data/album/:id', verifyAccount, getAlbum)
+spotifyRouter.get('/stats/song/:id', verifyAccount, getTimesListenedToSong)
 spotifyRouter.get('/me', verifyAccount, getUserData)
 spotifyRouter.get('/:user/me', verifyAccount, getUserData)
 spotifyRouter.get('/me/playback', verifyAccount, getUserPlayback)

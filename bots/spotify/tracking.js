@@ -48,6 +48,28 @@ export function getPlaybackState() {
   return playbackState
 }
 
+export function getSimplePlayback() {
+  var playback = { ...state }
+
+  if(playback.is_playing) {
+    var cur_song = {
+      title: playback.current_song.name,
+      artists: playback.current_song.artists.map(({ name, url }) => ({ name, url })),
+      album: playback.current_song.album.name,
+      artwork_url: playback.current_song.album.artwork_url,
+      duration: playback.current_song.duration,
+      position: playback.current_song.position
+    }
+
+    return {
+      is_playing: true,
+      song: cur_song
+    }
+  }
+  
+  return { is_playing: false }
+}
+
 export function getActiveSession() {
   return state.session.active ? { ...state.session, song_list: sessionSongState.list } : { active: false }
 }
