@@ -229,7 +229,7 @@ const getTimesListenedToArtist = async (req, res, next) => {
 
 var spotifyRouter = Router()
 
-spotifyRouter.get('/test/:id', getTimesListenedToArtist)
+// spotifyRouter.get('/test/:id', getTimesListenedToArtist)
 spotifyRouter.get('/playback', trackSimplePlayback)
 spotifyRouter.get('/login', verifyAccount, login)
 spotifyRouter.get('/auth', verifyAccount, loginCallback)
@@ -243,6 +243,7 @@ spotifyRouter.get('/data/session/:id', verifyAccount, getSession)
 spotifyRouter.get('/data/albums', verifyAccount, getAlbums)
 spotifyRouter.get('/data/album/:id', verifyAccount, getAlbum)
 spotifyRouter.get('/stats/song/:id', verifyAccount, getTimesListenedToSong)
+spotifyRouter.get('/stats/artist/:id', verifyAccount, getTimesListenedToArtist)
 spotifyRouter.get('/me', verifyAccount, getUserData)
 spotifyRouter.get('/:user/me', verifyAccount, getUserData)
 spotifyRouter.get('/me/playback', verifyAccount, getUserPlayback)
