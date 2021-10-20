@@ -3,7 +3,7 @@ import { Router } from "express"
 import { verifyAccount } from "../auth"
 
 import { getUserAPI, getPlaybackState, getActiveSession, getSimplePlayback } from '../../bots/spotify/index'
-import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession, getAlbumsWithSongs, getAlbumsWithoutSongs, getStoredAlbum, getStoredAlbums, countTimesListened, countTimesListenedByArtist } from "./data"
+import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession, getAlbumsWithSongs, getAlbumsWithoutSongs, getStoredAlbum, getStoredAlbums, countTimesListened, countTimesListenedByArtist, getTopListensOfSongs, getTopListensOfArtists } from "./data"
 import keys from '../../keys.json'
 import { login, loginCallback } from "./auth"
 
@@ -227,9 +227,57 @@ const getTimesListenedToArtist = async (req, res, next) => {
   }
 }
 
+const topSongListens = async (req, res, next) => {
+  var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 50
+  var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
+  const nextUrl = `/spotify/stats/songs`
+
+  try {
+    const { records, count } = await getTopListensOfSongs(limit, offset)
+
+    var returnData = {
+      records,
+      total_count: count
+    }
+
+    if(count-1 >= offset+limit)
+      returnData.next = `${nextUrl}?limit=${limit}&offset=${offset+limit}`
+
+    res.status(200).send(returnData)
+  } catch(err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
+const topArtistListens = async (req, res, next) => {
+  var limit = req.query.limit && req.query.limit > 0 ? Number(req.query.limit) : 20
+  var offset = req.query.offset && req.query.offset >= 0 ? Number(req.query.offset) : 0
+  const nextUrl = `/spotify/stats/artists`
+
+  try {
+    const { records, count } = await getTopListensOfArtists(limit, offset)
+
+    var returnData = {
+      records,
+      total_count: count
+    }
+
+    if(count-1 >= offset+limit)
+      returnData.next = `${nextUrl}?limit=${limit}&offset=${offset+limit}`
+
+    res.status(200).send(returnData)
+  } catch(err) {
+    console.error(err)
+    res.status(500).send({ message: "An error occurred.", error: err.message })
+    return
+  }
+}
+
 var spotifyRouter = Router()
 
-// spotifyRouter.get('/test/:id', getTimesListenedToArtist)
+spotifyRouter.get('/test/:id', topArtistListens)
 spotifyRouter.get('/playback', trackSimplePlayback)
 spotifyRouter.get('/login', verifyAccount, login)
 spotifyRouter.get('/auth', verifyAccount, loginCallback)
@@ -244,6 +292,8 @@ spotifyRouter.get('/data/albums', verifyAccount, getAlbums)
 spotifyRouter.get('/data/album/:id', verifyAccount, getAlbum)
 spotifyRouter.get('/stats/song/:id', verifyAccount, getTimesListenedToSong)
 spotifyRouter.get('/stats/artist/:id', verifyAccount, getTimesListenedToArtist)
+spotifyRouter.get('/stats/songs', verifyAccount, topSongListens)
+spotifyRouter.get('/stats/artists', verifyAccount, topArtistListens)
 spotifyRouter.get('/me', verifyAccount, getUserData)
 spotifyRouter.get('/:user/me', verifyAccount, getUserData)
 spotifyRouter.get('/me/playback', verifyAccount, getUserPlayback)

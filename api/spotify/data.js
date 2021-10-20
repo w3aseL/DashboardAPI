@@ -128,7 +128,6 @@ export const getStoredSessions = async (limit=10, id=0, songList=false, fullSong
   return { sessions: sessionData, total_count: sessionCount }
 }
 
-// 6ecx4OFG0nlUMqAi9OXQER S + M (D)
 export const getStoredAlbum = async (albumId) => {
   const album = await SpotifyAlbum.findOne({ where: { id: albumId } })
 
@@ -224,8 +223,6 @@ export const countTimesListenedByArtist = async id => {
 
   const artist = songs[0].Artists[0]
 
-  console.log(artist)
-
   var songIds = [], totalTimeListened = 0
 
   songs.forEach(song => songIds.push(song.id))
@@ -251,4 +248,81 @@ export const countTimesListenedByArtist = async id => {
   }
 
   return data
+}
+
+export const getTopListensOfSongs = async (limit, offset=0) => {
+  const records = await SpotifyTrackPlay.findAll({
+    attributes: [
+      [Sequelize.fn("COUNT", Sequelize.col("Song.id")), "times_listened"],
+      [Sequelize.fn("SUM", Sequelize.col("time_played")), "total_time_played"]
+    ],
+    include: {
+      model: SpotifySong
+    },
+    group: [ "Song.id" ],
+    order: [
+      [Sequelize.literal("times_listened"), "DESC"],
+      [Sequelize.literal("total_time_played"), "DESC"]
+    ]
+  })
+
+  var recordList = [], recordLimit = limit != 0 ? offset+limit : records.length
+
+  if(recordLimit > records.length) {
+    recordLimit = offset + (records.length % limit)
+  }
+
+  for(let i = offset; i < recordLimit; i++) {
+    var record = records[i], song = await getFullSongData(record.Song)
+    
+    var data = { 
+      times_listened: record.dataValues.times_listened,
+      total_time_played: record.dataValues.total_time_played,
+      song: song
+    }
+
+    recordList.push(data)
+  }
+
+  return { records: recordList, count: records.length }
+}
+
+export const getTopListensOfArtists = async (limit, offset=0) => {
+  const records = await SpotifyTrackPlay.findAll({
+    attributes: [
+      [Sequelize.fn("COUNT", Sequelize.col("Song.Artists.id")), "times_listened"],
+      [Sequelize.fn("SUM", Sequelize.col("time_played")), "total_time_played"]
+    ],
+    include: {
+      model: SpotifySong,
+      include: {
+        model: SpotifyArtist
+      }
+    },
+    group: [ "Song.Artists.id" ],
+    order: [
+      [Sequelize.literal("times_listened"), "DESC"],
+      [Sequelize.literal("total_time_played"), "DESC"]
+    ]
+  })
+
+  var recordList = [], recordLimit = limit != 0 ? offset+limit : records.length
+
+  if(recordLimit > records.length) {
+    recordLimit = offset + (records.length % limit)
+  }
+
+  for(let i = offset; i < recordLimit; i++) {
+    var record = records[i], artist = record.Song.Artists[0]
+    
+    var data = { 
+      times_listened: record.dataValues.times_listened,
+      total_time_played: record.dataValues.total_time_played,
+      artist: { id: artist.id, name: artist.name, url: artist.url }
+    }
+
+    recordList.push(data)
+  }
+
+  return { records: recordList, count: records.length }
 }
