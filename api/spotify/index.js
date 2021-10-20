@@ -277,7 +277,7 @@ const topArtistListens = async (req, res, next) => {
 
 var spotifyRouter = Router()
 
-spotifyRouter.get('/test/:id', topArtistListens)
+// spotifyRouter.get('/test/:id', topArtistListens)
 spotifyRouter.get('/playback', trackSimplePlayback)
 spotifyRouter.get('/login', verifyAccount, login)
 spotifyRouter.get('/auth', verifyAccount, loginCallback)
