@@ -12,6 +12,7 @@ import { spotifyRouter } from './spotify'
 import { twitterRouter } from './twitter'
 import { authRouter } from './auth'
 import { portfolioRouter } from './portfolio'
+import { twitchRouter } from './twitch'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -84,6 +85,9 @@ class ServerAPI {
 
     // PORTFOLIO EDITING
     this.app.use('/portfolio', portfolioRouter)
+
+    // TWITCH BOT CONTROLS
+    this.app.use('/twitch', twitchRouter)
 
     // OTHER
     this.app.use(express.static('public'));

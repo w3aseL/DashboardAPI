@@ -35,7 +35,7 @@ function updateState(data) {
 
   state = { ...data, position }
 
-  console.log(state)
+  // console.log(state)
 
   if(state.is_playing) {
     $("#artwork").attr("src", state.song.artwork_url)

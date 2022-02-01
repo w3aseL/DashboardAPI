@@ -390,3 +390,59 @@ export const fixMissingAlbumsIfAnyMissing = async () => {
     }, 1000 * 120)
   }
 }
+
+const ERROR = 0.1   // 10% ERROR
+
+const checkMarginOfError = (actualValue, numToCheck, error) => {
+  if (error > 1.0 || error < 0.0)
+    throw new Error("Error must be in decimal form between 0 and 1")
+
+  let actualError = actualValue * error
+
+  return (actualValue + actualError) >= numToCheck && (actualValue - actualError) <= numToCheck
+}
+
+export const findListenAnomalies = async () => {
+  const songs = await SpotifyTrackPlay.findAll({
+    include: { model: SpotifySong }
+  })
+
+  let count = 0
+
+  for(let i = 0; i < songs.length; i++) {
+    const play = songs[i]
+
+    if(play.time_played > (play.Song.duration * 2)) {
+      count++
+      play.update({ time_played: play.Song.duration })
+    }
+  }
+
+  SpotifyLogger.info(`Fixed ${count} songs with abnormal durations!`)
+
+  const sessions = await SpotifySession.findAll({
+    include: { model: SpotifyTrackPlay }
+  })
+
+  let sessionCount = 0
+
+  for(let i = 0; i < sessions.length; i++) {
+    const session = sessions[i]
+    var totalDuration = 0
+
+    for(let j = 0; j < session.TrackPlays.length; j++) {
+      totalDuration += session.TrackPlays[j].time_played
+    }
+
+    if(!checkMarginOfError(totalDuration, session.time_listening, ERROR) && (session.time_listening > 0 && session.TrackPlays.length != 0)) {
+      sessionCount++
+      session.update({ time_listening: totalDuration })
+    }
+  }
+
+  SpotifyLogger.info(`Fixed ${sessionCount} sessions with abnormal durations!`)
+
+  setTimeout(() => {
+    findListenAnomalies()
+  }, 1000 * 60 * 30)
+}
