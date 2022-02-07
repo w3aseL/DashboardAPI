@@ -555,5 +555,71 @@ ProjectTool.sync()
 
 portfolioSQL.authenticate()
 
+// Create Twitch
+const twitchSQL = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "../storage", "twitch-db.sqlite"),
+  logging: (msg) => DBLogger.info(msg)
+})
+
+// Twitch client authorization
+const TwitchClientAuth = twitchSQL.define('ClientAuth', {
+  access_token: {
+    type: DataTypes.STRING,
+    not_null: true
+  },
+  expires_in: {
+    type: DataTypes.INTEGER,
+    not_null: true
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    not_null: true
+  }
+}, {
+  createdAt: false,
+  updatedAt: false
+})
+
+// Twitch user authorization
+const TwitchUserAuth = twitchSQL.define('UserAuth', {
+  user_id: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  refresh_token: {
+    type: DataTypes.STRING,
+    not_null: true
+  },
+  refresh_created_at: {
+    type: DataTypes.DATE,
+    not_null: true
+  },
+  access_token: {
+    type: DataTypes.STRING,
+    not_null: true
+  },
+  expires_in: {
+    type: DataTypes.INTEGER,
+    not_null: true
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    not_null: true
+  }
+}, {
+  createdAt: false,
+  updatedAt: false
+})
+
+TwitchUserAuth.sync()
+
+twitchSQL.authenticate()
+
 export { spotifySQL, SpotifyAuth, twitterSQL, TwitterUser, TwitterStats, SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay, User,
-                    Category, Tool, Image, Resume, Education, Position, Project, ProjectImage, ProjectTool }
+                    Category, Tool, Image, Resume, Education, Position, Project, ProjectImage, ProjectTool, TwitchUserAuth }

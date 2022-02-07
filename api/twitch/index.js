@@ -2,6 +2,7 @@ import { Router } from "express"
 import { verifyAccount } from "../auth"
 
 import { isBotConnected, connectBot, disconnectBot } from "../../bots/chat"
+import { login, loginCallback } from "./auth"
 
 var twitchRouter = Router()
 
@@ -32,5 +33,7 @@ const performBotDisconnection = (req, res, next) => {
 twitchRouter.get("/is-connected", verifyAccount, getIsOnline)
 twitchRouter.get("/connect", verifyAccount, performBotConnection)
 twitchRouter.get("/disconnect", verifyAccount, performBotDisconnection)
+twitchRouter.get("/login", verifyAccount, login)
+twitchRouter.get("/redirect_auth", loginCallback)
 
 export { twitchRouter }

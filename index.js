@@ -7,6 +7,7 @@ import { SpotifyLogger, TwitterLogger, APILogger } from './helper/logger'
 import { mainDB } from './data/database'
 
 import { setupUserAPIs, updateUserPlaybackState, fixMissingAlbumsIfAnyMissing, findListenAnomalies } from './bots/spotify/index'
+import { setupTwitchAPIs } from "./bots/chat/api/index.js"
 
 const SECOND_IN_MS = 1000
 
@@ -16,6 +17,7 @@ function init() {
   // setTimeout(() => followReport(), 5000)
 
   setupUserAPIs()
+  setupTwitchAPIs()
 
   cron.schedule('* * * * *', () => checkIfLive())
 

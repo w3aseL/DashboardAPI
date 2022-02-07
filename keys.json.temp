@@ -47,7 +47,8 @@
   },
   "twitch":{
     "client": {
-      "id": "client id"
+      "id": "client id",
+      "secret": "client secret"
     },
     "chatbot": {
       "username": "username",

@@ -3,7 +3,7 @@ import keys from "../../keys.json"
 import { DEBUG } from "../../helper/args";
 import { processCommandMessage } from "./commands";
 
-const DEFAULT_CHANNEL = keys.twitch.chatbot.default_channel
+export const DEFAULT_CHANNEL = keys.twitch.chatbot.default_channel
 
 var options = {
   options: {
@@ -39,9 +39,7 @@ client.on("chat", function (channel, user, message, self) {
   // Don't listen to my own messages..
   if (self || !message.startsWith("!")) return;
 
-  processCommandMessage(message.slice(1).split(' '), user, msg => {
-    client.say(DEFAULT_CHANNEL, msg)
-  })
+  processCommandMessage(message.slice(1).split(' '), user, client)
 
   return
 
