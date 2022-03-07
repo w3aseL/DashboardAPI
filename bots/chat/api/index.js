@@ -108,9 +108,14 @@ const updateTwitchAPI = async idx => {
   })
 }
 
+/**
+ * 
+ * @param {string} username 
+ * @returns {TwitchUserAPI}
+ */
 export const getAPIByUsername = username => {
   for(var i in apis) {
-    if(apis[i].getUsername() === username) return apis[i]
+    if(apis[i].getUsername().toLowerCase() === username.toLowerCase()) return apis[i]
   }
 
   return null

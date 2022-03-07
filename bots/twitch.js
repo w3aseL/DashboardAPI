@@ -1,63 +1,36 @@
+import { getAPIByUsername } from './chat/api';
+
 var request = require('request');
 var keys = require('../keys.json');
 
-var TwitchAPI = {};
-
 var isLive = false;
 
-async function requestData(url) {
-    const options = {
-        url: url,
-        headers: {
-            'Client-ID': keys.twitch.client.id,
-            'Accept': 'application/vnd.twitchtv.v5+json'
-        }
-    };
-
-    return new Promise((resolve, reject) => {
-        request(options, function(error, response, body){
-            if(error) reject(error);
-            else resolve(body);
-        });
-    });
+async function streamInfo(username) {
+  return new Promise((resolve, reject) => {
+    getAPIByUsername(username).request(`/streams?user_login=${username}`)
+    .then(res => {
+      resolve(res)
+    })
+    .catch(err => {
+      reject(err)
+    })
+  })
 }
 
-TwitchAPI.getStreamInfo = async function(username) {
-    var id = await userIdFromUsername(username);
+export const isStreamLive = async function(username, callback) {
+    var { data } = await streamInfo(username);
 
-    var data = (await streamInfo(id));
+    var retInfo = null
 
-    return data;
-}
-
-TwitchAPI.isStreamLive = async function(username, callback) {
-    var data = await this.getStreamInfo(username);
-
-    if(data.stream === null) {
+    if(data == null || data.length === 0) {
         if(isLive) isLive = false;
         return false;
-    }
+    } else retInfo = data[0]
 
-    if(!isLive) {
+    if(!isLive && retInfo.type === "live") {
         console.log("w3aseL is live on Twitch! Sending tweet!");
 
         isLive = true;
-        callback(data.stream.game, data.stream.channel.url);
+        callback(retInfo.game_name, `https://www.twitch.tv/${retInfo.user_name}`);
     }
 }
-
-async function streamInfo(userId) {
-    var data = JSON.parse(await requestData(`https://api.twitch.tv/kraken/streams/${userId}`));
-
-    return data;
-}
-
-async function userIdFromUsername(username) {
-    var data = JSON.parse(await requestData(`https://api.twitch.tv/kraken/users?login=${username}`));
-
-    if(data._total > 0) return data.users[0]._id;
-
-    return -1;
-}
-
-export default TwitchAPI

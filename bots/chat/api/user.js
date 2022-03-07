@@ -22,13 +22,20 @@ export class TwitchUserAPI {
     return this.userId
   }
 
+  getUsername() {
+    return this.username
+  }
+
   async refreshAccessToken() {
     return new Promise((res, rej) => request({
       url: encodeURI(`https://id.twitch.tv/oauth2/token?grant_type=refresh_token&refresh_token=${this.refreshToken}&client_id=${this.clientId}&client_secret=${this.clientSecret}`),
       method: 'POST',
       json: true
     }, (err, resp, body) => {
-      if(err) rej(err)
+      if(err) {
+        console.log(err)
+        rej(err)
+      }
       else if(resp.statusCode > 400) rej(body)
       else res(body)
     }))
@@ -36,31 +43,42 @@ export class TwitchUserAPI {
 
   async validate() {
     return new Promise((res, rej) => request({
-        url: `https://id.twitch.tv/oauth2/validate`,
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`
-        },
-        json: true
-      }, (err, resp, body) => {
-        if(err) rej(err)
-        else if(resp.statusCode > 400) rej(body)
-        else res(body)
-      }))
+      url: `https://id.twitch.tv/oauth2/validate`,
+      method: 'GET',
+      headers: {
+        'Client-Id': this.clientId,
+        'Authorization': `Bearer ${this.accessToken}`
+      },
+      json: true
+    }, (err, resp, body) => {
+      if(err) {
+        console.log(err)
+        rej(err)
+      }
+      else if(resp.statusCode > 400) rej(body)
+      else res(body)
+    }))
   }
 
-  async request(url, method="GET", auth=true, headers={}) {
-    var headers = { ...headers }
+  async request(url, method="GET", data=undefined, auth=true, headers={}) {
+    var headers = {
+      'Client-Id': this.clientId,
+      ...headers
+    }
 
     if(auth) headers['Authorization'] = `Bearer ${this.accessToken}`
 
     return new Promise((res, rej) => request({
-      url: `https://api.twitch.tv/helix${url}`,
+      url: encodeURI(`https://api.twitch.tv/helix${url}`),
       method,
       json: true,
+      body: data,
       headers
     }, (err, resp, body) => {
-      if(err) rej(err)
+      if(err) {
+        console.log(err)
+        rej(err)
+      }
       else if(resp.statusCode > 400) rej(body)
       else res(body)
     }))

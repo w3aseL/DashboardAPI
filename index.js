@@ -3,7 +3,7 @@ import cron from "node-cron"
 
 import { followReport, checkIfLive } from "./tasks/index"
 import { DEBUG } from './helper/args'
-import { SpotifyLogger, TwitterLogger, APILogger } from './helper/logger'
+import { SpotifyLogger, TwitterLogger, APILogger, TwitchLogger } from './helper/logger'
 import { mainDB } from './data/database'
 
 import { setupUserAPIs, updateUserPlaybackState, fixMissingAlbumsIfAnyMissing, findListenAnomalies } from './bots/spotify/index'
@@ -12,14 +12,15 @@ import { setupTwitchAPIs } from "./bots/chat/api/index.js"
 const SECOND_IN_MS = 1000
 
 function init() {
-  checkIfLive()
-  
   // setTimeout(() => followReport(), 5000)
 
   setupUserAPIs()
   setupTwitchAPIs()
 
-  cron.schedule('* * * * *', () => checkIfLive())
+  setTimeout(() => {
+    TwitchLogger.info("Scheduled live tracking task!")
+    cron.schedule('* * * * *', () => checkIfLive())
+  }, SECOND_IN_MS * 10)
 
   if(DEBUG) {
     APILogger.info("API is in local developer mode!!!")

@@ -2,6 +2,8 @@ import { client } from "tmi.js"
 import { getPlaybackState } from "../../spotify"
 
 import { DEFAULT_CHANNEL } from "../"
+import { setGameBeingStreamed } from "./game"
+import { setTitleOfStream } from "./title"
 
 var channelState = {
   emoteOnly: false,
@@ -42,7 +44,7 @@ const addCommand = (name, process, checkPerms=(_) => true) => {
  * 
  * @param {import("tmi.js").ChatUserstate} user 
  */
-const isMod = user => user.mod || user["user-id"] === "admin" || user.username === DEFAULT_CHANNEL
+export const isMod = user => user.mod || user["user-id"] === "admin" || user.username === DEFAULT_CHANNEL
 
 addCommand("hello", (args, user, client) => {
   client.say(DEFAULT_CHANNEL, `Hello, ${user.username}!`)
@@ -101,13 +103,21 @@ addCommand("subscriberonly", (args, user, client) => {
   }
 }, isMod)
 
-addCommand("setinfo", (args, user, client) => {
+addCommand("setinfo", async (args, user, client) => {
   if(args.length == 0) {
     client.say(DEFAULT_CHANNEL, `@${user.username}, "!setinfo" requires more arguments!`)
   } else {
     const subCmd = args.shift().toLowerCase()
 
     switch(subCmd) {
+      case "game": {
+        await setGameBeingStreamed(args, user, client)
+        return
+      }
+      case "title": {
+        await setTitleOfStream(args, user, client)
+        return
+      }
       case "help": {
         client.say(DEFAULT_CHANNEL, `@${user.username}: "!setinfo title|game [sub-arguments]"`)
         return

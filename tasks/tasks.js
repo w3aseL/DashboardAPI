@@ -1,5 +1,5 @@
 import { botTwit, mainTwit } from "../bots/twodder"
-import twitch from "../bots/twitch"
+import { isStreamLive } from "../bots/twitch"
 import { LogColors } from '../helper/logger'
 import keys from '../keys.json'
 import { TwitterStats } from "../data/database"
@@ -43,11 +43,11 @@ ${LogColors.FgWhite}--------------------------`)
 }
 
 export function checkIfLive() {
-  twitch.isStreamLive("w3aseL", tweetLive);
+  isStreamLive("w3aseL", tweetLive);
 }
 
 export function tweetLive(game, url) {
   if(!game) return
 
-  botTwit.postTweet(`@_w3aseL is live on Twitch! He is playing ${game}!\n${url}`);
+  botTwit.postTweet(`.@_w3aseL is live on Twitch! He is playing ${game}!\n${url}`);
 }

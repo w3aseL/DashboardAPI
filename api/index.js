@@ -38,10 +38,23 @@ const logger = (req, res, next) => {
   next()
 }
 
-var whitelist = [ 'https://dashboard.noahtemplet.dev', "https://statistics.noahtemplet.dev", 'https://noahtemplet.dev' ]
+var whitelist = [ 'dashboard.noahtemplet.dev', 'statistics.noahtemplet.dev', 'noahtemplet.dev', 'weasel.gg', 'dash.weasel.gg' ]
+
+const verifyOrigin = origin => {
+  var foundOrigin = false
+
+  whitelist.forEach(wlOrig => {
+    const fullUrl = `https://${wlOrig.toLowerCase()}`, fullwww = `https://www.${wlOrig.toLowerCase()}`
+
+    if(origin.toLowerCase() === fullUrl || origin.toLowerCase() === fullwww) foundOrigin = true
+  })
+
+  return foundOrigin
+}
+
 var corsOptions = {
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
+    if (verifyOrigin(origin)) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
