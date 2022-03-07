@@ -41,6 +41,8 @@ const logger = (req, res, next) => {
 var whitelist = [ 'dashboard.noahtemplet.dev', 'statistics.noahtemplet.dev', 'noahtemplet.dev', 'weasel.gg', 'dash.weasel.gg', 'api.noahtemplet.dev' ]
 
 const verifyOrigin = origin => {
+  if(!origin) return true
+
   var foundOrigin = false
 
   whitelist.forEach(wlOrig => {
