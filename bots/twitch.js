@@ -18,19 +18,21 @@ async function streamInfo(username) {
 }
 
 export const isStreamLive = async function(username, callback) {
-    var { data } = await streamInfo(username);
+  if(getAPIByUsername(username) == null) return
 
-    var retInfo = null
+  var { data } = await streamInfo(username)
 
-    if(data == null || data.length === 0) {
-        if(isLive) isLive = false;
-        return false;
-    } else retInfo = data[0]
+  var retInfo = null
 
-    if(!isLive && retInfo.type === "live") {
-        console.log("w3aseL is live on Twitch! Sending tweet!");
+  if(data == null || data.length === 0) {
+      if(isLive) isLive = false;
+      return false;
+  } else retInfo = data[0]
 
-        isLive = true;
-        callback(retInfo.game_name, `https://www.twitch.tv/${retInfo.user_name}`);
-    }
+  if(!isLive && retInfo.type === "live") {
+      console.log("w3aseL is live on Twitch! Sending tweet!");
+
+      isLive = true;
+      callback(retInfo.game_name, `https://www.twitch.tv/${retInfo.user_name}`);
+  }
 }
