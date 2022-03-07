@@ -46,7 +46,7 @@ const verifyOrigin = origin => {
   whitelist.forEach(wlOrig => {
     const fullUrl = `https://${wlOrig.toLowerCase()}`, fullwww = `https://www.${wlOrig.toLowerCase()}`
 
-    if(origin.toLowerCase() === fullUrl || origin.toLowerCase() === fullwww) foundOrigin = true
+    if(origin === fullUrl || origin === fullwww) foundOrigin = true
   })
 
   return foundOrigin
