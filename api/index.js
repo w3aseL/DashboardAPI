@@ -38,7 +38,7 @@ const logger = (req, res, next) => {
   next()
 }
 
-var whitelist = [ 'dashboard.noahtemplet.dev', 'statistics.noahtemplet.dev', 'noahtemplet.dev', 'weasel.gg', 'dash.weasel.gg' ]
+var whitelist = [ 'dashboard.noahtemplet.dev', 'statistics.noahtemplet.dev', 'noahtemplet.dev', 'weasel.gg', 'dash.weasel.gg', 'api.noahtemplet.dev' ]
 
 const verifyOrigin = origin => {
   var foundOrigin = false
