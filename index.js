@@ -8,6 +8,7 @@ import { mainDB } from './data/database'
 
 import { setupUserAPIs, updateUserPlaybackState, fixMissingAlbumsIfAnyMissing, findListenAnomalies } from './bots/spotify/index'
 import { setupTwitchAPIs } from "./bots/chat/api/index.js"
+import { setupDestinyUserAPIs } from "./bots/destiny/auth.js"
 
 const SECOND_IN_MS = 1000
 
@@ -16,6 +17,7 @@ function init() {
 
   setupUserAPIs()
   setupTwitchAPIs()
+  setupDestinyUserAPIs()
 
   setTimeout(() => {
     TwitchLogger.info("Scheduled live tracking task!")

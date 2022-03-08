@@ -78,5 +78,12 @@
     "access": "access key",
     "secret": "secret key",
     "bucket": "bucket.link.name"
+  },
+  "destiny": {
+    "apiKey": "api key",
+    "client": {
+      "id": "client id",
+      "secret": "client secret"
+    }
   }
 }

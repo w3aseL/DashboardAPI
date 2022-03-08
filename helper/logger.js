@@ -101,4 +101,16 @@ export const AccountLogger = {
   }
 }
 
+export const DestinyLogger = {
+  log: (message) => {
+    console.log(`${colors.FgWhite}[Destiny API] ${colors.Reset}${message}${colors.Reset}`)
+  },
+  info: (message) => {
+    console.log(`${colors.FgWhite}[Destiny API] ${colors.FgYellow}${message}${colors.Reset}`)
+  },
+  error: (message) => {
+    console.log(`${colors.FgWhite}[Destiny API] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+  }
+}
+
 export { colors as LogColors }

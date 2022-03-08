@@ -621,5 +621,52 @@ TwitchUserAuth.sync()
 
 twitchSQL.authenticate()
 
+// Create Destiny API database
+const destinySQL = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "../storage", "destiny-db.sqlite"),
+  logging: (msg) => DBLogger.info(msg)
+})
+
+// Destiny user authorization
+const DestinyUserAuth = destinySQL.define('DestinyUser', {
+  membership_id: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  display_name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  refresh_token: {
+    type: DataTypes.STRING,
+    not_null: true
+  },
+  refresh_created_at: {
+    type: DataTypes.DATE,
+    not_null: true
+  },
+  access_token: {
+    type: DataTypes.STRING,
+    not_null: true
+  },
+  expires_in: {
+    type: DataTypes.INTEGER,
+    not_null: true
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    not_null: true
+  }
+}, {
+  createdAt: false,
+  updatedAt: false
+})
+
+DestinyUserAuth.sync()
+
+destinySQL.authenticate()
+
 export { spotifySQL, SpotifyAuth, twitterSQL, TwitterUser, TwitterStats, SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay, User,
-                    Category, Tool, Image, Resume, Education, Position, Project, ProjectImage, ProjectTool, TwitchUserAuth }
+                    Category, Tool, Image, Resume, Education, Position, Project, ProjectImage, ProjectTool, TwitchUserAuth, DestinyUserAuth }

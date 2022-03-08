@@ -13,6 +13,7 @@ import { twitterRouter } from './twitter'
 import { authRouter } from './auth'
 import { portfolioRouter } from './portfolio'
 import { twitchRouter } from './twitch'
+import { destinyRouter } from './destiny'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -103,6 +104,9 @@ class ServerAPI {
 
     // TWITCH BOT CONTROLS
     this.app.use('/twitch', twitchRouter)
+
+    // DESTINY AUTHENTICATION FOR API
+    this.app.use('/destiny', destinyRouter)
 
     // OTHER
     this.app.use(express.static('public'));

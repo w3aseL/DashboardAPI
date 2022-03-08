@@ -42,48 +42,6 @@ client.on("chat", function (channel, user, message, self) {
   processCommandMessage(message.slice(1).split(' '), user, client)
 
   return
-
-  if (user["user-type"] === "mod") {
-    if (message === "!clear") {
-      client.clear(DEFAULT_CHANNEL);
-      client.action(DEFAULT_CHANNEL, "cleared chat clutter!");
-    } else if (message === "!hello") {
-      client.say(DEFAULT_CHANNEL, "Hi, " + user.username + "!")
-    } else if (message === "!commercial") {
-      client.commercial(DEFAULT_CHANNEL, 30);
-      client.action(DEFAULT_CHANNEL, "is running a 30 second commercial!");
-    } else if (message == "!emoteonly") {
-      client.action(DEFAULT_CHANNEL, "sets chat to emote only!")
-      client.emoteonly(DEFAULT_CHANNEL);
-    } else if (message == "!normal") {
-      client.action(DEFAULT_CHANNEL, "sets chat to normal!")
-      client.emoteonlyoff(DEFAULT_CHANNEL);
-      client.subscribersoff(DEFAULT_CHANNEL);
-    }
-  }
-
-  if (user.username === DEFAULT_CHANNEL) {
-    if (message === "!clear") {
-      client.clear(DEFAULT_CHANNEL);
-      client.action(DEFAULT_CHANNEL, "cleared chat clutter!");
-    } else if (message === "!hello") {
-      client.say(DEFAULT_CHANNEL, "Hi, " + user.username + "!")
-    } else if (message === "!commercial") {
-      client.commercial(DEFAULT_CHANNEL, 30);
-      client.action(DEFAULT_CHANNEL, "is running a 30 second commercial!");
-    } else if (message == "!emoteonly") {
-      client.action(DEFAULT_CHANNEL, "sets chat to emote only!")
-      client.emoteonly(DEFAULT_CHANNEL);
-    } else if (message == "!normal") {
-      client.action(DEFAULT_CHANNEL, "sets chat to normal!")
-      client.emoteonlyoff(DEFAULT_CHANNEL);
-      client.subscribersoff(DEFAULT_CHANNEL);
-    }
-  }
-
-  if (user.username == "nightbot") {
-    client.say(DEFAULT_CHANNEL, "FAK OFF NIGHTBOT!");
-  }
 });
 
 client.on("join", function (channel, username, self) {
