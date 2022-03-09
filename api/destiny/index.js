@@ -6,10 +6,12 @@ import { login, loginCallback } from "./auth";
 var destinyRouter = Router()
 
 const testRoute = async (req, res, next) => {
+  const { slot } = req.query
+
   const DESTINY_API = getUserAPI("Weasel")
 
   try {
-    var data = await DESTINY_API.getListOfCharacters()
+    var data = await DESTINY_API.getSlotItemFromCurrentCharacter(!slot ? "primary" : slot)
 
     res.status(200).send({ data })
   } catch(err) {

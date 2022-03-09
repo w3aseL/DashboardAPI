@@ -2,6 +2,7 @@ import { DestinyAPI } from '.';
 import { DestinyLogger, LogColors } from '../../helper/logger'
 import { DestinyUserAuth } from '../../data/database'
 import keys from '../../keys.json'
+import { setupManifest } from './manifest';
 
 var userApis = []
 
@@ -58,6 +59,12 @@ export const setupDestinyUserAPIs = async () => {
 
     setTimeout(() => updateUserAPI(index), Math.floor(timeToTimeout) * 1000)
   }
+
+  if(userApis.length > 0) {
+    var firstApi = userApis[0]
+
+    setupManifest((await firstApi.api.retrieveManifest())['Response'])
+  }
 }
 
 const updateUserAPI = async index => {
@@ -71,9 +78,9 @@ const updateUserAPI = async index => {
   .then(data => {
     const curTime = new Date()
 
-    DestinyUserAuth.update({ access_token: data.body.access_token, created_at: curTime, expires_in: data.body.expires_in }, { where: { display_name: id } })
+    DestinyUserAuth.update({ access_token: data.access_token, created_at: curTime, expires_in: data.expires_in }, { where: { display_name: id } })
 
-    userApis[index].api.setAccessToken(data.body.access_token)
+    userApis[index].api.setAccessToken(data.access_token)
     DestinyLogger.log(`Updated access token for user ${id}`)
   })
   .catch(err => {
