@@ -1,7 +1,10 @@
 import request from "request"
+import { getFirstAPI } from "."
 import { DestinyLogger } from "../../helper/logger"
 
 const DEFAULT_LANGUAGE = "en"
+
+var isManifestUpdating = false
 
 var manifestCache = {
   version: "???"
@@ -19,15 +22,20 @@ const getManifestRequestFromContentPaths = async jsonWorldContentPaths => new Pr
   })
 })
 
-export const setupManifest = async ({ version, jsonWorldContentPaths }) => {
-  const data = await getManifestRequestFromContentPaths(jsonWorldContentPaths)
+export const doManifestUpdate = async () => {
+  const api = getFirstAPI()
 
-  manifestCache = { version, ...data }
+  if(!api) {
+    DestinyLogger.info("No API available to setup the manifest!")
+    return
+  }
 
-  DestinyLogger.info(`Manifest loaded! (latest version: ${version})`)
-}
+  if(isManifestUpdating) return
 
-export const updateManifest = async ({ version, jsonWorldContentPaths }) => {
+  isManifestUpdating = true
+
+  var { version, jsonWorldContentPaths } = (await api.retrieveManifest())['Response']
+
   if(manifestCache.version !== version) {
     const data = await getManifestRequestFromContentPaths(jsonWorldContentPaths)
 
@@ -35,6 +43,8 @@ export const updateManifest = async ({ version, jsonWorldContentPaths }) => {
 
     DestinyLogger.info(`Manifest loaded! (latest version: ${version})`)
   }
+
+  isManifestUpdating = false
 }
 
 export const getInfoAboutItem = hash => manifestCache['DestinyInventoryItemDefinition'][hash]

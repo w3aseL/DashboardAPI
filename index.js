@@ -3,12 +3,13 @@ import cron from "node-cron"
 
 import { followReport, checkIfLive } from "./tasks/index"
 import { DEBUG } from './helper/args'
-import { SpotifyLogger, TwitterLogger, APILogger, TwitchLogger } from './helper/logger'
+import { SpotifyLogger, TwitterLogger, APILogger, TwitchLogger, DestinyLogger } from './helper/logger'
 import { mainDB } from './data/database'
 
 import { setupUserAPIs, updateUserPlaybackState, fixMissingAlbumsIfAnyMissing, findListenAnomalies } from './bots/spotify/index'
 import { setupTwitchAPIs } from "./bots/chat/api/index.js"
 import { setupDestinyUserAPIs } from "./bots/destiny/auth.js"
+import { doManifestUpdate } from "./bots/destiny/manifest.js"
 
 const SECOND_IN_MS = 1000
 
@@ -34,6 +35,11 @@ function init() {
   cron.schedule('0 0 * * *', () => {
     TwitterLogger.info('Generating follow report!')
     followReport()
+  })
+
+  cron.schedule('5 */3 * * *', () => {
+    DestinyLogger.info('Checking Destiny manifest for updates!')
+    doManifestUpdate()
   })
 
   setTimeout(() => {

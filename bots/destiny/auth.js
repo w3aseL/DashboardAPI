@@ -2,7 +2,7 @@ import { DestinyAPI } from '.';
 import { DestinyLogger, LogColors } from '../../helper/logger'
 import { DestinyUserAuth } from '../../data/database'
 import keys from '../../keys.json'
-import { setupManifest } from './manifest';
+import { doManifestUpdate, setupManifest } from './manifest';
 
 var userApis = []
 
@@ -60,11 +60,7 @@ export const setupDestinyUserAPIs = async () => {
     setTimeout(() => updateUserAPI(index), Math.floor(timeToTimeout) * 1000)
   }
 
-  if(userApis.length > 0) {
-    var firstApi = userApis[0]
-
-    setupManifest((await firstApi.api.retrieveManifest())['Response'])
-  }
+  setTimeout(() => doManifestUpdate(), 10000)
 }
 
 const updateUserAPI = async index => {
@@ -101,6 +97,17 @@ export const getUserAPI = name => {
     if(userApis[i].id == name)
       return userApis[i].api
   }
+
+  return null
+}
+
+/**
+ * Gets the first available API
+ * 
+ * @returns {DestinyAPI}
+ */
+export const getFirstAPI = () => {
+  if(userApis.length > 0) return userApis[0].api
 
   return null
 }
