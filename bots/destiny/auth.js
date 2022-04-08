@@ -74,17 +74,19 @@ const updateUserAPI = async index => {
   .then(data => {
     const curTime = new Date()
 
-    DestinyUserAuth.update({ access_token: data.access_token, created_at: curTime, expires_in: data.expires_in }, { where: { display_name: id } })
+    DestinyUserAuth.update({ access_token: data.access_token, created_at: curTime, expires_in: data.expires_in, refresh_token: data.refresh_token, refresh_created_at: curTime, refresh_expires_in: data.refresh_expires_in  }, { where: { display_name: id } })
 
-    userApis[index].api.setAccessToken(data.access_token)
+    var expiresIn = data.expiresIn
+
+    userApis[index].api.setTokens(data.access_token, data.refresh_token)
     DestinyLogger.log(`Updated access token for user ${id}`)
+
+    setTimeout(() => updateUserAPI(index), expiresIn * 1000)
   })
   .catch(err => {
     DestinyLogger.error(`Failed to update access token for user ${id}`)
     console.error(err)
   })
-
-  setTimeout(() => updateUserAPI(index), 3600 * 1000)
 }
 
 /**

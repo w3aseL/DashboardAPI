@@ -77,13 +77,13 @@ const updateUserAPI = async index => {
 
     userApis[index].api.setAccessToken(data.body.access_token)
     SpotifyLogger.log(`Updated access token for user ${id}`)
+
+    setTimeout(() => updateUserAPI(index), 3600 * 1000)
   })
   .catch(err => {
     SpotifyLogger.error(`Failed to update access token for user ${id}`)
     console.error(err)
   })
-
-  setTimeout(() => updateUserAPI(index), 3600 * 1000)
 }
 
 export const getUserAPI = name => {
