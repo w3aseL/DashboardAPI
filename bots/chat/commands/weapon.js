@@ -2,7 +2,7 @@ import { DEFAULT_CHANNEL } from ".."
 import { getUserAPI } from "../../destiny"
 
 
-const SLOTS = [ "primary", "secondary", "power", "hemlet", "gauntlets", "chestplate", "leggings", "class" ]
+const SLOTS = [ "primary", "secondary", "power", "helmet", "gauntlets", "chestplate", "leggings", "class" ]
 
 /**
  * Get Weapon From Slot
