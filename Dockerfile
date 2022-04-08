@@ -9,4 +9,6 @@ RUN yarn install
 # Copy all of the code and helpers
 COPY . .
 
+EXPOSE 8080
+
 CMD [ "npm", "run", "prod" ]

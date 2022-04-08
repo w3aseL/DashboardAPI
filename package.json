@@ -23,7 +23,7 @@
     "generate-password": "^1.6.0",
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "node-cron": "^2.0.3",
     "request": "^2.88.0",
     "sequelize": "^6.15.0",
