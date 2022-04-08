@@ -1,0 +1,9 @@
+node_modules
+storage_backup
+.gitignore
+docker-compose.yml
+Dockerfile
+keys.json.temp
+LICENSE
+package-lock.json
+README.md

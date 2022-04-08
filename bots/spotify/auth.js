@@ -122,28 +122,48 @@ export const registerUser = async data => {
 
   var username = result.body.id
 
-  userApis.push({ id: username, api: userAPI })
-
   const users = await SpotifyAuth.findAll({ where: { display_name: username } })
 
-  if(users.length > 0)
-    return { registered: false, message: "User is already registered!" }
+  if(users.length > 0) {
+    var dbUpdate = {
+      refresh_token: data.refresh_token,
+      refresh_created_at: curTime,
+      access_token: data.access_token,
+      expires_in: data.expires_in,
+      created_at: curTime
+    }
 
-  var dbInsert = {
-    display_name: username,
-    refresh_token: data.refresh_token,
-    refresh_created_at: curTime,
-    access_token: data.access_token,
-    expires_in: data.expires_in,
-    created_at: curTime
+    try {
+      const user = await SpotifyAuth.update(dbUpdate,{ where: { display_name: username }})
+    } catch(e) {
+      console.error(e)
+      return { registered: false, message: "Failed to insert keys into database", error: e }
+    }
+
+    for(var i = 0; i < userApis.length; i++) {
+      if(userApis[i].id === username) userApis[i].api = userAPI
+    }
+
+    return { registered: true, message: `User ${username}'s registration has successfully been updated!` }
+  } else {
+    var dbInsert = {
+      display_name: username,
+      refresh_token: data.refresh_token,
+      refresh_created_at: curTime,
+      access_token: data.access_token,
+      expires_in: data.expires_in,
+      created_at: curTime
+    }
+  
+    try {
+      const user = await SpotifyAuth.create(dbInsert)
+    } catch (e) {
+      console.error(e)
+      return { registered: false, message: "Failed to insert keys into database", error: e }
+    }
+
+    userApis.push({ id: username, api: userAPI })
+  
+    return { registered: true, message: "User has been successfully registered!" }
   }
-
-  try {
-    const user = await SpotifyAuth.create(dbInsert)
-  } catch (e) {
-    console.error(e)
-    return { registered: false, message: "Failed to insert keys into database", error: e }
-  }
-
-  return { registered: true, message: "User has been successfully registered!" }
 }

@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid'
 
 var scopes = ['user-read-email', 'user-read-playback-state', 'user-read-playback-position', 'user-read-currently-playing', 'user-read-recently-played', 'user-top-read']
 
-const REDIRECT_URI = DEBUG ? `http://localhost:${API_PORT}` : `https://${keys.ip_info.prod_ip}`
+const REDIRECT_URI = DEBUG ? `localhost:${API_PORT}` : `${keys.ip_info.prod_ip}`
 
 spotifyAPI.setRedirectURI(`http://${REDIRECT_URI}/spotify/auth`)
 
@@ -37,7 +37,7 @@ export const login = (req, res, next) => {
 
   var url = spotifyAPI.createAuthorizeURL(scopes, state)
 
-  res.redirect(encodeURI(url))
+  res.send({ url: encodeURI(url) })
 }
 
 export const loginCallback = async (req, res, next) => {

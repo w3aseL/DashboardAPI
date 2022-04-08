@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  dashboard-api:
+    container_name: dashboard-api
+    image: dashboard-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - /storage:/storage
+      - /keys.json:/keys.json
+      - /keys:/keys
