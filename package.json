@@ -7,6 +7,7 @@
     "fresh-install": "rm -r node_modules/ && sudo LZZ_COMPAT=1 npm install",
     "start": "nodemon --ignore public/ --exec babel-node index.js \"backend-port=8000 debug=true\"",
     "prod": "babel-node index.js backend-port=8080",
+    "prod-debug": "babel-node index.js \"backend-port=8080 debug=true\"",
     "pm2": "pm2 start npm --no-automation --name \"dash-api\" -- run prod"
   },
   "keywords": [
