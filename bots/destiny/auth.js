@@ -76,7 +76,7 @@ const updateUserAPI = async index => {
 
     DestinyUserAuth.update({ access_token: data.access_token, created_at: curTime, expires_in: data.expires_in, refresh_token: data.refresh_token, refresh_created_at: curTime, refresh_expires_in: data.refresh_expires_in  }, { where: { display_name: id } })
 
-    var expiresIn = data.expiresIn
+    var expiresIn = 3600
 
     userApis[index].api.setTokens(data.access_token, data.refresh_token)
     DestinyLogger.info(`Updated access token for user ${id}`)

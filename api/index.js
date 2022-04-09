@@ -19,20 +19,7 @@ const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
 const logger = (req, res, next) => {
   const log = () => {
-    const curTime = new Date()
-    const timeStr = `${curTime.getMonth() + 1}-${curTime.getDate()}-${curTime.getFullYear()} ${formatTimeNum(curTime.getHours())}:${formatTimeNum(curTime.getMinutes())}:${formatTimeNum(curTime.getSeconds())}`
-
-    const getColorFromCode = (status) => {
-      if(status >= 200 && status < 300)
-        return LogColors.FgGreen
-      else if(status >= 300 && status < 400)
-        return LogColors.FgYellow
-      else if(status >= 400 && status < 500)
-        return LogColors.FgRed
-      else return LogColors.FgMagenta
-    }
-
-    APILogger.info(`${LogColors.FgBlue}${timeStr} ${LogColors.FgWhite}-- ${LogColors.FgYellow}${req.method} ${LogColors.FgCyan}${req.originalUrl} ${getColorFromCode(res.statusCode)}${res.statusCode}`)
+    APILogger.info(`${req.method} ${req.originalUrl} ${res.statusCode}`)
   }
 
   res.on('finish', log)

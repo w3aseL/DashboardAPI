@@ -37,7 +37,8 @@ const mainLogger = createLogger({
     timestamp(),
     printf(({level, message, label, timestamp}) => {
       return `${timestamp} [${label}] ${level}: ${message}`;
-    })
+    }),
+    format.json()
   ),
   transports: [
     new transports.Console(),
