@@ -35,10 +35,10 @@ const { combine, timestamp, printf } = format;
 const mainLogger = createLogger({
   format: combine(
     timestamp(),
+    format.json(),
     printf(({level, message, label, timestamp}) => {
       return `${timestamp} [${label}] ${level}: ${message}`;
-    }),
-    format.json()
+    })
   ),
   transports: [
     new transports.Console(),
