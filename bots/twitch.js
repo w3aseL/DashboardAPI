@@ -1,3 +1,4 @@
+import { TwitchLogger } from '../helper/logger';
 import { getAPIByUsername } from './chat/api';
 
 var request = require('request');
@@ -30,7 +31,7 @@ export const isStreamLive = async function(username, callback) {
   } else retInfo = data[0]
 
   if(!isLive && retInfo.type === "live") {
-      console.log("w3aseL is live on Twitch! Sending tweet!");
+      TwitchLogger.info("w3aseL is live on Twitch! Sending tweet!");
 
       isLive = true;
       callback(retInfo.game_name, `https://www.twitch.tv/${retInfo.user_name}`);

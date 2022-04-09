@@ -32,13 +32,13 @@ export const setupUserAPIs = async () => {
         SpotifyAuth.update({ access_token: data.body.access_token, created_at: curTime, expires_in: data.body.expires_in }, { where: { display_name: user.display_name } })
 
         userAPI.setAccessToken(data.body.access_token)
-        SpotifyLogger.log(`Created user API and updated access token for user ${user.display_name}`)
+        SpotifyLogger.info(`Created user API and updated access token for user ${user.display_name}`)
 
         userApis.push({ id: user.display_name, api: userAPI })
       })
       .catch(err => {
         SpotifyLogger.error(`Failed to update access token for user ${user.display_name}`)
-        console.error(err)
+        SpotifyLogger.error(err)
       })
     } else { 
       userAPI.setAccessToken(user.access_token)
@@ -46,7 +46,7 @@ export const setupUserAPIs = async () => {
       
       timeToTimeout -= timeElapsedSinceUpdate
 
-      SpotifyLogger.log(`Created user API for ${user.display_name}, updates access token in ${Math.floor(timeToTimeout)} seconds`)
+      SpotifyLogger.info(`Created user API for ${user.display_name}, updates access token in ${Math.floor(timeToTimeout)} seconds`)
     }
 
     var index = -1
@@ -76,13 +76,13 @@ const updateUserAPI = async index => {
     SpotifyAuth.update({ access_token: data.body.access_token, created_at: curTime, expires_in: data.body.expires_in }, { where: { display_name: id } })
 
     userApis[index].api.setAccessToken(data.body.access_token)
-    SpotifyLogger.log(`Updated access token for user ${id}`)
+    SpotifyLogger.info(`Updated access token for user ${id}`)
 
     setTimeout(() => updateUserAPI(index), 3600 * 1000)
   })
   .catch(err => {
     SpotifyLogger.error(`Failed to update access token for user ${id}`)
-    console.error(err)
+    SpotifyLogger.error(err)
   })
 }
 
@@ -115,7 +115,7 @@ export const registerUser = async data => {
     result = await userAPI.getMe()
   } catch (e) {
     SpotifyLogger.error("An error has occurred when retreiving the user's profile!")
-    console.log(e)
+    SpotifyLogger.error(e)
 
     return { registered: false, message: "An error occurred fetching your profile!", error: e }
   }
@@ -136,7 +136,7 @@ export const registerUser = async data => {
     try {
       const user = await SpotifyAuth.update(dbUpdate,{ where: { display_name: username }})
     } catch(e) {
-      console.error(e)
+      SpotifyLogger.error(e)
       return { registered: false, message: "Failed to insert keys into database", error: e }
     }
 
@@ -158,7 +158,7 @@ export const registerUser = async data => {
     try {
       const user = await SpotifyAuth.create(dbInsert)
     } catch (e) {
-      console.error(e)
+      SpotifyLogger.error(e)
       return { registered: false, message: "Failed to insert keys into database", error: e }
     }
 

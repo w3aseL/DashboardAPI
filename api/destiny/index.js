@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getUserAPI } from "../../bots/destiny";
+import { DestinyLogger } from "../../helper/logger";
 import { verifyAccount } from "../auth";
 import { login, loginCallback } from "./auth";
 
@@ -15,7 +16,7 @@ const testRoute = async (req, res, next) => {
 
     res.status(200).send({ data })
   } catch(err) {
-    console.log(err)
+    DestinyLogger.error(err)
     res.status(500).send({ message: "TEST ROUTE FAILED! D:" })
   }
 }

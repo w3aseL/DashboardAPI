@@ -1,4 +1,5 @@
 import request from "request"
+import { TwitchLogger } from "../../../helper/logger"
 
 export class TwitchUserAPI {
   constructor(credentials) {
@@ -33,7 +34,7 @@ export class TwitchUserAPI {
       json: true
     }, (err, resp, body) => {
       if(err) {
-        console.log(err)
+        TwitchLogger.error(e)
         rej(err)
       }
       else if(resp.statusCode > 400) rej(body)
@@ -52,7 +53,7 @@ export class TwitchUserAPI {
       json: true
     }, (err, resp, body) => {
       if(err) {
-        console.log(err)
+        TwitchLogger.error(err)
         rej(err)
       }
       else if(resp.statusCode > 400) rej(body)
@@ -76,7 +77,7 @@ export class TwitchUserAPI {
       headers
     }, (err, resp, body) => {
       if(err) {
-        console.log(err)
+        TwitchLogger.error(err)
         rej(err)
       }
       else if(resp.statusCode > 400) rej(body)

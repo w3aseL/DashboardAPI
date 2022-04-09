@@ -50,18 +50,18 @@ export const setupTwitchAPIs = async () => {
 
         api.setTokens(access_token, refresh_token )
 
-        TwitchLogger.log(`Created user API and updated access token for user ${user.username}`)
+        TwitchLogger.info(`Created user API and updated access token for user ${user.username}`)
         apis.push(api)
       })
       .catch(err => {
         TwitchLogger.error(`Failed to update access token for user ${user.username}`)
-        console.error(err)
+        TwitchLogger.error(err)
       })
     } else {
       apis.push(api)
       timeToTimeout -= timeElapsedSinceUpdate
 
-      TwitchLogger.log(`Created Twitch API for ${user.username}, updates access token in ${Math.floor(timeToTimeout)} seconds`)
+      TwitchLogger.info(`Created Twitch API for ${user.username}, updates access token in ${Math.floor(timeToTimeout)} seconds`)
     }
 
     var index = -1
@@ -91,11 +91,11 @@ const updateTwitchAPI = async idx => {
 
     apis[idx].setTokens(access_token, refresh_token)
 
-    TwitchLogger.log(`Updated access and refresh tokens for user ${user.username}`)
+    TwitchLogger.info(`Updated access and refresh tokens for user ${user.username}`)
   })
   .catch(err => {
     TwitchLogger.error(`Failed to update access token for user ${user.username}`)
-    console.error(err)
+    TwitchLogger.error(err)
   })
 
   setTimeout(() => updateUserAPI(index), user.expires_in * 1000)
@@ -104,7 +104,7 @@ const updateTwitchAPI = async idx => {
   .then(_ => TwitchLogger.info(`Performed successful validation for user ${user.username}`))
   .catch(err => {
     TwitchLogger.error(`Failed to validate for user ${user.username}`)
-    console.log(err)
+    TwitchLogger.error(err)
   })
 }
 
@@ -162,7 +162,7 @@ export const registerUser = async (code, requestURI) => {
 
     return { registered: true, message: "User has been successfully registered!" }
   } catch(e) {
-    console.log(e)
+    TwitchLogger.error(e)
     return { registered: false, message: "Failed to setup user for Twitch!", error: e }
   }
 }

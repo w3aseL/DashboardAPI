@@ -2,6 +2,7 @@ import { DEBUG, API_PORT } from '../../helper/args'
 import keys from '../../keys.json'
 import { v4 as uuid } from 'uuid'
 import { registerUser } from '../../bots/chat/api'
+import { TwitchLogger } from '../../helper/logger'
 
 const SCOPES = ['channel:manage:broadcast', 'channel:edit:commercial', 'channel:manage:predictions',
     'channel:manage:redemptions', 'channel:read:hype_train', 'channel:read:subscriptions',
@@ -55,7 +56,7 @@ export const loginCallback = async (req, res, next) => {
   registerUser(code, REDIRECT)
   .then(({ registered, message, ...rest }) => res.status(registered ? 201 : 400).send({ message, ...rest }))
   .catch(err => {
-    console.error(err)
+    TwitchLogger.error(err)
     res.status(500).send({ message: "An error occurred when retrieving the tokens for Twitch.", error: err })
   })
 }

@@ -1,4 +1,5 @@
 import { DEBUG } from "./args";
+import { createLogger, format, transports } from "winston"
 
 //https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
 const colors = {
@@ -29,87 +30,136 @@ const colors = {
   BgWhite: "\x1b[47m",
 }
 
+const { combine, timestamp, printf } = format;
+
+const mainLogger = createLogger({
+  format: combine(
+    timestamp(),
+    printf(({level, message, label, timestamp}) => {
+      return `${timestamp} [${label}] ${level}: ${message}`;
+    })
+  ),
+  transports: [
+    new transports.Console(),
+    new transports.File({
+      filename: 'logs/all.log'
+    }),
+    new transports.File({
+      filename: 'logs/info.log',
+      level: 'info'
+    }),
+    new transports.File({
+      filename: 'logs/error.log',
+      level: 'error'
+    })
+  ],
+  exceptionHandlers: [
+    new transports.File({
+      filename: 'logs/exceptions.log'
+    })
+  ],
+  rejectionHandlers: [
+    new transports.File({
+      filename: 'logs/rejections.log'
+    })
+  ]
+})
+
+const apiLogger = mainLogger.child({ label: "API" })
+
 export const APILogger = {
-  log: (message) => {
-    console.log(`${colors.FgBlue}[API] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    apiLogger.warn(message)
   },
   info: (message) => {
-    console.log(`${colors.FgBlue}[API] ${colors.FgYellow}${message}${colors.Reset}`)
+    apiLogger.info(message)
   },
   error: (message) => {
-    console.log(`${colors.FgBlue}[API] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    apiLogger.error(message)
   }
 }
+
+const twitterLogger = mainLogger.child({ label: "Twitter" })
 
 export const TwitterLogger = {
-  log: (message) => {
-    console.log(`${colors.FgCyan}[Twitter] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    twitterLogger.warn(message)
   },
   info: (message) => {
-    console.log(`${colors.FgCyan}[Twitter] ${colors.FgYellow}${message}${colors.Reset}`)
+    twitterLogger.info(message)
   },
   error: (message) => {
-    console.log(`${colors.FgCyan}[Twitter] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    twitterLogger.error(message)
   }
 }
+
+const dbLogger = mainLogger.child({ label: "DB Manager" })
 
 export const DBLogger = {
-  log: (message) => {
-    if(DEBUG) console.log(`${colors.FgGreen}[DB Manager] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    if(DEBUG) dbLogger.warn(message)
   },
   info: (message) => {
-    if(DEBUG) console.log(`${colors.FgGreen}[DB Manager] ${colors.FgYellow}${message}${colors.Reset}`)
+    if(DEBUG) dbLogger.info(message)
   },
   error: (message) => {
-    if(DEBUG) console.log(`${colors.FgGreen}[DB Manager] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    if(DEBUG) dbLogger.error(message)
   }
 }
+
+const spotifyLogger = mainLogger.child({ label: "Spotify API" })
 
 export const SpotifyLogger = {
-  log: (message) => {
-    console.log(`${colors.FgGreen}[Spotify API] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    spotifyLogger.warn(message)
   },
   info: (message) => {
-    console.log(`${colors.FgGreen}[Spotify API] ${colors.FgYellow}${message}${colors.Reset}`)
+    spotifyLogger.info(message)
   },
   error: (message) => {
-    console.log(`${colors.FgGreen}[Spotify API] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    spotifyLogger.error(message)
   }
 }
+
+const twitchLogger = mainLogger.child({ label: "Twitch API" })
 
 export const TwitchLogger = {
-  log: (message) => {
-    console.log(`${colors.FgMagenta}[Twitch Chat API] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    twitchLogger.warn(message)
   },
   info: (message) => {
-    console.log(`${colors.FgMagenta}[Twitch Chat API] ${colors.FgYellow}${message}${colors.Reset}`)
+    twitchLogger.info(message)
   },
   error: (message) => {
-    console.log(`${colors.FgMagenta}[Twitch Chat API] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    twitchLogger.error(message)
   }
 }
+
+const accountLogger = mainLogger.child({ label: "Account Manager" })
 
 export const AccountLogger = {
-  log: (message) => {
-    console.log(`${colors.FgRed}[Account Manager] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    accountLogger.warn(message)
   },
   info: (message) => {
-    console.log(`${colors.FgRed}[Account Manager] ${colors.FgYellow}${message}${colors.Reset}`)
+    accountLogger.info(message)
   },
   error: (message) => {
-    console.log(`${colors.FgRed}[Account Manager] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    accountLogger.error(message)
   }
 }
 
+const destinyLogger = mainLogger.child({ label: "Destiny API" })
+
 export const DestinyLogger = {
-  log: (message) => {
-    console.log(`${colors.FgWhite}[Destiny API] ${colors.Reset}${message}${colors.Reset}`)
+  warn: (message) => {
+    destinyLogger.warn(message)
   },
   info: (message) => {
-    console.log(`${colors.FgWhite}[Destiny API] ${colors.FgYellow}${message}${colors.Reset}`)
+    destinyLogger.info(message)
   },
   error: (message) => {
-    console.log(`${colors.FgWhite}[Destiny API] ${colors.FgRed}Error: ${message}${colors.Reset}`)
+    destinyLogger.error(message)
   }
 }
 

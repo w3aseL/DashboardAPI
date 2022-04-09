@@ -6,6 +6,7 @@ import { getUserAPI, getPlaybackState, getActiveSession, getSimplePlayback } fro
 import { getStoredSongs, getStoredSessions, getStoredSong, getStoredSession, getAlbumsWithSongs, getAlbumsWithoutSongs, getStoredAlbum, getStoredAlbums, countTimesListened, countTimesListenedByArtist, getTopListensOfSongs, getTopListensOfArtists } from "./data"
 import keys from '../../keys.json'
 import { login, loginCallback } from "./auth"
+import { SpotifyLogger } from "../../helper/logger"
 
 const getUserData = (req, res, next) => {
   const user = (req.params != {} && req.params.user) ? req.params.user : keys.spotify.default_user
@@ -74,7 +75,7 @@ const getSong = async (req, res, next) => {
 
     res.status(200).send(song)
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -100,7 +101,7 @@ const getSongs = async (req, res, next) => {
 
     res.status(200).send(returnData)
   } catch (err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -119,7 +120,7 @@ const getSession = async (req, res, next) => {
 
     res.status(200).send(session)
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -147,7 +148,7 @@ const getSessions = async (req, res, next) => {
 
     res.status(200).send(returnData)
   } catch (err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -166,7 +167,7 @@ const getAlbum = async (req, res, next) => {
 
     res.status(200).send(album)
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -193,7 +194,7 @@ const getAlbums = async (req, res, next) => {
 
     res.status(200).send(returnData)
   } catch (err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -207,7 +208,7 @@ const getTimesListenedToSong = async (req, res, next) => {
 
     res.status(200).send({ ...records })
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -221,7 +222,7 @@ const getTimesListenedToArtist = async (req, res, next) => {
 
     res.status(200).send({ ...records })
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -245,7 +246,7 @@ const topSongListens = async (req, res, next) => {
 
     res.status(200).send(returnData)
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }
@@ -269,7 +270,7 @@ const topArtistListens = async (req, res, next) => {
 
     res.status(200).send(returnData)
   } catch(err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred.", error: err.message })
     return
   }

@@ -57,7 +57,7 @@ export const loginCallback = async (req, res, next) => {
 
     res.status(registered ? 201 : 400).send({ message, ...rest })
   } catch (err) {
-    console.error(err)
+    SpotifyLogger.error(err)
     res.status(500).send({ message: "An error occurred when retrieving the tokens for Spotify.", error: err })
     return
   }

@@ -31,7 +31,7 @@ const startAccountProcess = async (req, res, next) => {
     authData.passwords.push({ password: hashedPW, timeToExpiration: 600 })
   })
 
-  AccountLogger.log(`Your password to start the account process is: ${newPassword}`);
+  AccountLogger.info(`Your password to start the account process is: ${newPassword}`);
 
   res.status(200).send({ message: "Account request process has been started!" });
 }

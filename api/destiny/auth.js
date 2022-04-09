@@ -1,6 +1,7 @@
 import { registerUser } from '../../bots/destiny/index'
 import keys from '../../keys.json'
 import { v4 as uuid } from 'uuid'
+import { DestinyLogger } from '../../helper/logger'
 
 var openStates = []
 
@@ -50,7 +51,7 @@ export const loginCallback = async (req, res, next) => {
 
     res.status(registered ? 201 : 400).send({ message, ...rest })
   } catch (err) {
-    console.error(err)
+    DestinyLogger.error(err)
     res.status(500).send({ message: "An error occurred when retrieving the tokens for the Destiny API.", error: err })
     return
   }

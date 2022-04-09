@@ -1,6 +1,6 @@
 import { botTwit, mainTwit } from "../bots/twodder"
 import { isStreamLive } from "../bots/twitch"
-import { LogColors } from '../helper/logger'
+import { LogColors, TwitterLogger } from '../helper/logger'
 import keys from '../keys.json'
 import { TwitterStats } from "../data/database"
 
@@ -16,7 +16,7 @@ export async function followReport() {
     infoMain = (await mainTwit.getUserInfo())
     infoBot = (await botTwit.getUserInfo())
   } catch(e) {
-    console.error(`${LogColors.FgRed}Failed to perform follow report: ${e.message}`)
+    TwitterLogger.error(`${LogColors.FgRed}Failed to perform follow report: ${e.message}`)
     return
   }
 
@@ -29,12 +29,12 @@ export async function followReport() {
     TwitterStats.create({ TwitterUserId: mainTwit.getSimpleUserInfo().id, collected_at: curTime, follower_count: mainFollowerCount, following_count: mainFollowingCount })
     TwitterStats.create({ TwitterUserId: botTwit.getSimpleUserInfo().id, collected_at: curTime, follower_count: botFollowerCount, following_count: botFollowingCount })
   } catch(e) {
-    console.error(`${LogColors.FgRed}Failed to perform follow report: ${e.message}`)
+    TwitterLogger.error(`${LogColors.FgRed}Failed to perform follow report: ${e.message}`)
     return
   }
 
   // buncha jumbled stuff lol
-  console.log(`${LogColors.FgYellow}Follower Report:
+  TwitterLogger.info(`${LogColors.FgYellow}Follower Report:
 ${LogColors.FgWhite}People Following ${LogColors.FgCyan}@${mainTwit.getSimpleUserInfo().screen_name}: ${LogColors.FgYellow}${mainFollowerCount}
 ${LogColors.FgWhite}People Following ${LogColors.FgCyan}@${botTwit.getSimpleUserInfo().screen_name}: ${LogColors.FgYellow}${botFollowerCount}
 ${LogColors.FgGreen}Written to database!

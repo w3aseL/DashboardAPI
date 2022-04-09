@@ -1,6 +1,7 @@
 import { getAPIByUsername } from "../api"
 
 import { DEFAULT_CHANNEL } from ".."
+import { TwitchLogger } from "../../../helper/logger"
 
 /**
  * 
@@ -15,7 +16,7 @@ export const setTitleOfStream = async (args, user, client) => {
   api.request(`/channels?broadcaster_id=${api.getId()}`, "PATCH", { title })
   .then(_ => client.say(DEFAULT_CHANNEL, `@${user.username}, updated title!`))
   .catch(err => {
-    console.log(err)
+    TwitchLogger.error(err)
     client.say(DEFAULT_CHANNEL, `@${user.username}, unable to update the current game being played. An error occurred on my side!`)
   })
 

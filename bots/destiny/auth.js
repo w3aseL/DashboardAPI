@@ -31,13 +31,13 @@ export const setupDestinyUserAPIs = async () => {
         timeToTimeout = data.expires_in
 
         userAPI.setTokens(data.access_token, data.refresh_token)
-        DestinyLogger.log(`Created user API and updated access token for user with ID ${user.membership_id}`)
+        DestinyLogger.info(`Created user API and updated access token for user with ID ${user.membership_id}`)
 
         userApis.push({ id: user.display_name, api: userAPI })
       })
       .catch(err => {
         DestinyLogger.error(`Failed to update access token for user ${user.display_name}`)
-        console.error(err)
+        DestinyLogger.error(err)
       })
     } else { 
       userAPI.setTokens(user.access_token)
@@ -45,7 +45,7 @@ export const setupDestinyUserAPIs = async () => {
       
       timeToTimeout -= timeElapsedSinceUpdate
 
-      DestinyLogger.log(`Created user API for ${user.display_name}, updates access token in ${Math.floor(timeToTimeout)} seconds`)
+      DestinyLogger.info(`Created user API for ${user.display_name}, updates access token in ${Math.floor(timeToTimeout)} seconds`)
     }
 
     var index = -1
@@ -79,13 +79,13 @@ const updateUserAPI = async index => {
     var expiresIn = data.expiresIn
 
     userApis[index].api.setTokens(data.access_token, data.refresh_token)
-    DestinyLogger.log(`Updated access token for user ${id}`)
+    DestinyLogger.info(`Updated access token for user ${id}`)
 
     setTimeout(() => updateUserAPI(index), expiresIn * 1000)
   })
   .catch(err => {
     DestinyLogger.error(`Failed to update access token for user ${id}`)
-    console.error(err)
+    DestinyLogger.error(err)
   })
 }
 
@@ -128,7 +128,7 @@ export const registerUser = async code => {
     result = (await userAPI.request(`/User/GetBungieNetUserById/${data.membership_id}/`))['Response']
   } catch (e) {
     DestinyLogger.error("An error has occurred when retreiving the user's profile!")
-    console.log(e)
+    DestinyLogger.error(e)
 
     return { registered: false, message: "An error occurred fetching your profile!", error: e }
   }
@@ -153,7 +153,7 @@ export const registerUser = async code => {
   try {
     const user = await DestinyUserAuth.create(dbInsert)
   } catch (e) {
-    console.error(e)
+    DestinyLogger.error(e)
     return { registered: false, message: "Failed to insert keys into database", error: e }
   }
 
