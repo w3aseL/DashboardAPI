@@ -98,7 +98,7 @@ const updateTwitchAPI = async idx => {
     TwitchLogger.error(err)
   })
 
-  setTimeout(() => updateUserAPI(index), user.expires_in * 1000)
+  setTimeout(() => updateTwitchAPI(index), user.expires_in * 1000)
 
   apis[idx].validate()
   .then(_ => TwitchLogger.info(`Performed successful validation for user ${user.username}`))
