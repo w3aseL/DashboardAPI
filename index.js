@@ -3,7 +3,7 @@ import cron from "node-cron"
 
 import { followReport, checkIfLive } from "./tasks/index"
 import { DEBUG } from './helper/args'
-import { SpotifyLogger, TwitterLogger, APILogger, TwitchLogger, DestinyLogger } from './helper/logger'
+import { SpotifyLogger, TwitterLogger, APILogger, TwitchLogger, DestinyLogger, ApplicationLogger } from './helper/logger'
 import { mainDB } from './data/database'
 
 import { setupUserAPIs, updateUserPlaybackState, fixMissingAlbumsIfAnyMissing, findListenAnomalies } from './bots/spotify/index'
@@ -55,5 +55,15 @@ function init() {
     // findListenAnomalies()
   }, SECOND_IN_MS * 15)
 }
+
+process.on('uncaughtException', err => {
+  ApplicationLogger.error("An uncaught exception was found!")
+  ApplicationLogger.error(err)
+})
+
+process.on('unhandledRejection', err => {
+  ApplicationLogger.error("An unhandled rejection was found!")
+  ApplicationLogger.error(err)
+})
 
 init()

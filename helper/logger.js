@@ -164,4 +164,18 @@ export const DestinyLogger = {
   }
 }
 
+const applicationLogger = mainLogger.child({ label: "Application" })
+
+export const ApplicationLogger = {
+  warn: (message) => {
+    applicationLogger.warn(message)
+  },
+  info: (message) => {
+    destinapplicationLoggeryLogger.info(message)
+  },
+  error: (message) => {
+    applicationLogger.error(message)
+  }
+}
+
 export { colors as LogColors }

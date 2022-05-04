@@ -52,6 +52,12 @@ var corsOptions = {
   }
 }
 
+const errorHandler = (err, req, res, next) => {
+  if(!err) return next()
+
+  res.status(500).send({ message: "An uncaught error occurred on the server side!" })
+}
+
 class ServerAPI {
   constructor(port) {
     this.app = express()
@@ -61,6 +67,7 @@ class ServerAPI {
     }))
 
     this.app.use(logger)
+    this.app.use(errorHandler)
 
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
