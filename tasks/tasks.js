@@ -1,6 +1,6 @@
 import { botTwit, mainTwit } from "../bots/twodder"
 import { isStreamLive } from "../bots/twitch"
-import { LogColors, TwitterLogger } from '../helper/logger'
+import { LogColors, TwitchLogger, TwitterLogger } from '../helper/logger'
 import keys from '../keys.json'
 import { TwitterStats } from "../data/database"
 import { validateAPIs } from "../bots/chat/api"
@@ -17,7 +17,7 @@ export async function followReport() {
     infoMain = (await mainTwit.getUserInfo())
     infoBot = (await botTwit.getUserInfo())
   } catch(e) {
-    TwitterLogger.error(`${LogColors.FgRed}Failed to perform follow report: ${e.message}`)
+    TwitterLogger.error(`Failed to perform follow report: ${e.message}`)
     return
   }
 
@@ -30,17 +30,17 @@ export async function followReport() {
     TwitterStats.create({ TwitterUserId: mainTwit.getSimpleUserInfo().id, collected_at: curTime, follower_count: mainFollowerCount, following_count: mainFollowingCount })
     TwitterStats.create({ TwitterUserId: botTwit.getSimpleUserInfo().id, collected_at: curTime, follower_count: botFollowerCount, following_count: botFollowingCount })
   } catch(e) {
-    TwitterLogger.error(`${LogColors.FgRed}Failed to perform follow report: ${e.message}`)
+    TwitterLogger.error(`Failed to perform follow report: ${e.message}`)
     return
   }
 
   // buncha jumbled stuff lol
-  TwitterLogger.info(`${LogColors.FgYellow}Follower Report:
-${LogColors.FgWhite}People Following ${LogColors.FgCyan}@${mainTwit.getSimpleUserInfo().screen_name}: ${LogColors.FgYellow}${mainFollowerCount}
-${LogColors.FgWhite}People Following ${LogColors.FgCyan}@${botTwit.getSimpleUserInfo().screen_name}: ${LogColors.FgYellow}${botFollowerCount}
-${LogColors.FgGreen}Written to database!
-${LogColors.FgYellow}Time Completed: ${LogColors.FgCyan}${curTime.toLocaleString()}
-${LogColors.FgWhite}--------------------------`)
+  TwitterLogger.info(`Follower Report:
+People Following @${mainTwit.getSimpleUserInfo().screen_name}: ${mainFollowerCount}
+People Following @${botTwit.getSimpleUserInfo().screen_name}: ${botFollowerCount}
+Written to database!
+Time Completed: ${curTime.toLocaleString()}
+--------------------------`)
 }
 
 export function checkIfLive() {
@@ -54,5 +54,6 @@ export function tweetLive(game, url) {
 }
 
 export function validateTwitchAPIs() {
+  TwitchLogger.info("Validating available Twitch APIs.")
   validateAPIs()
 }
