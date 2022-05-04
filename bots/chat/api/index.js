@@ -72,8 +72,6 @@ export const setupTwitchAPIs = async () => {
         break
       }
     }
-
-    setTimeout(() => updateTwitchAPI(index), Math.floor(timeToTimeout) * 1000)
   }
 }
 
@@ -97,15 +95,6 @@ const updateTwitchAPI = async idx => {
     TwitchLogger.error(`Failed to update access token for user ${user.username}`)
     TwitchLogger.error(err)
   })
-
-  setTimeout(() => updateTwitchAPI(index), user.expires_in * 1000)
-
-  apis[idx].validate()
-  .then(_ => TwitchLogger.info(`Performed successful validation for user ${user.username}`))
-  .catch(err => {
-    TwitchLogger.error(`Failed to validate for user ${user.username}`)
-    TwitchLogger.error(err)
-  })
 }
 
 /**
@@ -122,6 +111,17 @@ export const getAPIByUsername = username => {
 }
 
 export const defaultTwitchAPI = getAPIByUsername(keys.twitch.chatbot.default_channel)
+
+export const validateAPIs = () => {
+  for(var i in apis) {
+    apis[i].validate()
+    .then(_ => TwitchLogger.info(`Performed successful validation for user ${apis[i].getUsername()}`))
+    .catch(_ => {
+      TwitchLogger.error(`Failed to validate for user ${apis[i].getUsername()}, treating as expired!`)
+      updateTwitchAPI(i)
+    })
+  }
+}
 
 export const registerUser = async (code, requestURI) => {
   var data = null

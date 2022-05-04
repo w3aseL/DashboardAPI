@@ -3,6 +3,7 @@ import { isStreamLive } from "../bots/twitch"
 import { LogColors, TwitterLogger } from '../helper/logger'
 import keys from '../keys.json'
 import { TwitterStats } from "../data/database"
+import { validateAPIs } from "../bots/chat/api"
 
 var info = {
   followersMain: 0,
@@ -50,4 +51,8 @@ export function tweetLive(game, url) {
   if(!game) return
 
   botTwit.postTweet(`.@_w3aseL is live on Twitch! He is playing ${game}!\n${url}`);
+}
+
+export function validateTwitchAPIs() {
+  validateAPIs()
 }

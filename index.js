@@ -1,7 +1,7 @@
 import { api } from "./api/index.js"
 import cron from "node-cron"
 
-import { followReport, checkIfLive } from "./tasks/index"
+import { followReport, checkIfLive, validateTwitchAPIs } from "./tasks/index"
 import { DEBUG } from './helper/args'
 import { SpotifyLogger, TwitterLogger, APILogger, TwitchLogger, DestinyLogger, ApplicationLogger } from './helper/logger'
 import { mainDB } from './data/database'
@@ -23,6 +23,7 @@ function init() {
   setTimeout(() => {
     TwitchLogger.info("Scheduled live tracking task!")
     cron.schedule('* * * * *', () => checkIfLive())
+    cron.schedule('0 * * * *', () => validateTwitchAPIs())
   }, SECOND_IN_MS * 10)
 
   if(DEBUG) {
