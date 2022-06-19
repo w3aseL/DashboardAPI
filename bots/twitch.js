@@ -39,7 +39,7 @@ export const isStreamLive = async function(username, callback) {
     }
   } catch(e) {
     TwitchLogger.error("An error has occurred when checking if the streamer is live!")
-    TwitchLogger.error(e)
+    TwitchLogger.error(JSON.stringify(e))
     validateAPIs()
   }
 }

@@ -27,6 +27,8 @@ const reqInitTokens = async (code, redirectURI) => {
 export const setupTwitchAPIs = async () => {
   const users = await TwitchUserAuth.findAll()
 
+  apis = []
+
   for(var i in users) {
     var user = users[i], timeToTimeout = user.expires_in
 
@@ -81,15 +83,26 @@ const updateTwitchAPI = async idx => {
   if(!user) return
 
   apis[idx].refreshAccessToken()
-  .then(res => {
+  .then(async res => {
     var curTime = new Date()
-    const { access_token, refresh_token } = res
+    
+    if(res.status >= 400) {
+      const username = user.username
 
-    user.update({ access_token, refresh_token, created_at: curTime, refresh_created_at: curTime })
+      await user.destroy()
 
-    apis[idx].setTokens(access_token, refresh_token)
+      setupTwitchAPIs()
 
-    TwitchLogger.info(`Updated access and refresh tokens for user ${user.username}`)
+      TwitchLogger.info(`Deleted api for user ${username}, user needs to refresh authentication`)
+    } else {
+      const { access_token, refresh_token } = res
+
+      user.update({ access_token, refresh_token, created_at: curTime, refresh_created_at: curTime })
+
+      apis[idx].setTokens(access_token, refresh_token)
+
+      TwitchLogger.info(`Updated access and refresh tokens for user ${user.username}`)
+    }
   })
   .catch(err => {
     TwitchLogger.error(`Failed to update access token for user ${user.username}`)
@@ -143,8 +156,25 @@ export const registerUser = async (code, requestURI) => {
 
     const users = await TwitchUserAuth.findAll({ where: { user_id: validation.user_id } })
 
-    if(users.length > 0)
-      return { registered: false, message: "User is already registered!" }
+    if(users.length > 0) {
+      
+    } else {
+      api.initializeInfo(validation.user_id, validation.login)
+
+      apis.push(api)
+
+      await TwitchUserAuth.create({
+        user_id: validation.user_id,
+        username: validation.login,
+        refresh_token: data.refresh_token,
+        refresh_created_at: currentTime,
+        access_token: data.access_token,
+        expires_in: data.expires_in,
+        created_at: currentTime
+      })
+
+      return { registered: true, message: "User has been successfully registered!" }
+    }
 
     api.initializeInfo(validation.user_id, validation.login)
 

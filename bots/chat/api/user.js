@@ -37,7 +37,7 @@ export class TwitchUserAPI {
         TwitchLogger.error(e)
         rej(err)
       }
-      else if(resp.statusCode > 400) rej(body)
+      else if(resp.statusCode > 400) rej(resp)
       else res(body)
     }))
   }
@@ -56,7 +56,7 @@ export class TwitchUserAPI {
         TwitchLogger.error(err)
         rej(err)
       }
-      else if(resp.statusCode > 400) rej(body)
+      else if(resp.statusCode > 400) rej(resp)
       else res(body)
     }))
   }
@@ -80,7 +80,7 @@ export class TwitchUserAPI {
         TwitchLogger.error(err)
         rej(err)
       }
-      else if(resp.statusCode > 400) rej(body)
+      else if(resp.statusCode > 400) rej(resp)
       else res(body)
     }))
   }
