@@ -85,5 +85,12 @@
       "id": "client id",
       "secret": "client secret"
     }
+  },
+  "db": {
+    "host": "host",
+    "username": "dbusername",
+    "password": "dbpass",
+    "database": "dbname",
+    "dialect": "mysql"
   }
 }

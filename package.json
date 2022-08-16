@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "fresh-install": "rm -r node_modules/ && sudo LZZ_COMPAT=1 npm install",
-    "start": "nodemon --ignore public/ --exec babel-node index.js \"backend-port=8000 debug=true\"",
-    "prod": "babel-node index.js backend-port=8080",
-    "prod-debug": "babel-node index.js \"backend-port=8080 debug=true\"",
+    "start": "nodemon --ignore public/ --exec babel-node src/index.js \"backend-port=8000 debug=true\"",
+    "prod": "babel-node src/index.js backend-port=8080",
+    "prod-debug": "babel-node src/index.js \"backend-port=8080 debug=true\"",
     "pm2": "pm2 start npm --no-automation --name \"dash-api\" -- run prod"
   },
   "keywords": [
@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.915.0",
+    "babel-plugin-module-resolver": "^4.1.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -25,11 +26,12 @@
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
     "minimist": "^1.2.6",
+    "mysql2": "^2.3.3",
     "node-cron": "^2.0.3",
     "request": "^2.88.0",
     "sequelize": "^6.15.0",
     "spotify-web-api-node": "^4.0.0",
-    "sqlite3": "^5.0.0",
+    "sqlite3": "^5.0.11",
     "tmi.js": "^1.8.5",
     "twit": "^2.2.11",
     "uuid": "^7.0.3",
@@ -39,7 +41,8 @@
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
-    "@babel/preset-env": "^7.9.5"
+    "@babel/preset-env": "^7.9.5",
+    "babel-plugin-root-import": "^6.6.0"
   },
   "nodemonConfig": {
     "ignore": [
