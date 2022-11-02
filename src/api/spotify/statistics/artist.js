@@ -68,7 +68,7 @@ export const getArtistStatistics = async (offset=0, limit=15, songs=[], artists=
       [Sequelize.col("Song.Artists.name"), "name"],
       [Sequelize.col("Song.Artists.url"), "url"]
     ],
-    group: [ "Song.Artists.id" ],
+    group: [ "Song.Artists.name" ],
     order: [
       [Sequelize.literal("times_listened"), "DESC"],
       [Sequelize.literal("total_time_played"), "DESC"]
