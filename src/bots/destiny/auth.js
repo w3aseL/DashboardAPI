@@ -30,7 +30,7 @@ export const setupDestinyUserAPIs = async () => {
 
         DestinyUserAuth.update({ access_token: data.access_token, created_at: curTime, expires_in: data.expires_in, refresh_token: data.refresh_token, refresh_created_at: curTime, refresh_expires_in: data.refresh_expires_in  }, { where: { membership_id: user.membership_id } })
 
-        timeToTimeout = data.expires_in
+        timeToTimeout = data.expires_in - EXPIRATION_BUFFER
 
         userAPI.setTokens(data.access_token, data.refresh_token)
         DestinyLogger.info(`Created user API and updated access token for user with ID ${user.membership_id}`)
