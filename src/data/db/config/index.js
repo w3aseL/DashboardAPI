@@ -5,10 +5,11 @@ import { DBLogger } from "@/helper/logger"
 import keys from "@/data/keys"
 
 // Create Sequelize DB in prod or dev
-const { host, dialect, username, password, database } = keys.db ? keys.db : {}
+// const { host, dialect, username, password, database } = keys.db ? keys.db : {}
 
-var db = null
+var db = new Sequelize({ dialect: "sqlite", storage: path.join(process.cwd(), "storage", "db.sqlite"), logging: (msg) => DBLogger.info(msg) }) 
 
+/*
 if (DEBUG) {
   db = new Sequelize({ dialect: "sqlite", storage: path.join(process.cwd(), "storage", "db.sqlite"), logging: (msg) => DBLogger.info(msg) }) 
 } else {
@@ -21,6 +22,7 @@ if (DEBUG) {
     logging: (msg) => DBLogger.info(msg)
   })
 }
+*/
 
 db.authenticate()
 
