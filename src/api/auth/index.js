@@ -5,6 +5,7 @@ import { User } from "@/data/database"
 import { createTokenSet, refreshAccessToken, verifyAccessToken } from "@/auth/token"
 import { generateRandomString, hashPassword, checkPassword } from "@/auth/hash"
 import { AccountLogger } from "@/helper/logger"
+import { checkForPermission, extractPermissions, encodePermissions } from "@/auth/perms"
 
 var authData = { 
   passwords: []
@@ -153,6 +154,8 @@ const verifyAccount = async (req, res, next) => {
     req.user = {
       username: user.username,
       id: user.id,
+      email: user.email ? user.email : undefined,
+      permissions: user.permissionLevel
     }
 
     next()
@@ -161,6 +164,19 @@ const verifyAccount = async (req, res, next) => {
     AccountLogger.error(e)
     return
   }
+}
+
+const verifyPermission = async (perm, req, res, next) => {
+  if(checkForPermission(req.user.permissionLevel, "administrator") || checkForPermission(req.user.permissionLevel, perm))
+    next()
+  else
+    res.status(401).send({ message: "You do not have the appropriate permissions to handle this command. Inquire with an administrator about accessing this permission!" })
+}
+
+const getPermissions = async (req, res, next) => {
+  const perms = extractPermissions(req.user.permissions)
+
+  res.status(200).send({ perms })
 }
 
 const performAccessTokenRefresh = async (req, res, next) => {
@@ -214,10 +230,11 @@ const updatePassword = async (req, res, next) => {
 
 var authRouter = Router()
 
-authRouter.get('/request-registration', startAccountProcess);
-authRouter.post('/register', createAccount)
+// authRouter.get('/request-registration', startAccountProcess);
+// authRouter.post('/register', createAccount)
 authRouter.post('/login', loginAccount)
 authRouter.post('/refresh', performAccessTokenRefresh)
 authRouter.post('/update-password', verifyAccount, updatePassword)
+authRouter.get('/permissions', verifyAccount, getPermissions)
 
-export { authRouter, verifyAccount }
+export { authRouter, verifyAccount, verifyPermission }

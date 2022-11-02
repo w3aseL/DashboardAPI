@@ -668,7 +668,9 @@ DestinyUserAuth.sync()
 
 destinySQL.authenticate()
 
-export { spotifySQL, SpotifyAuth, twitterSQL, TwitterUser, TwitterStats, SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay, User,
-                   Category, Tool, Image, Resume, Education, Position, Project, ProjectImage, ProjectTool, TwitchUserAuth, DestinyUserAuth }
+// ERASE FOR MIGRATION
+// export { SpotifyAuth, SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay, SpotifyArtistAlbum, SpotifySongArtist, SpotifySongAlbum,
+//           TwitterUser, TwitterStats, User, Category, Tool, Image, Resume, Education, Position, Project, ProjectImage, ProjectTool, TwitchUserAuth, DestinyUserAuth }
 
-// export * from './db/models/index'
+// COMMENT OUT FOR MIGRATION
+export * from './db/models/index'

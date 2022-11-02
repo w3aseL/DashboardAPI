@@ -1,5 +1,5 @@
 function setupArgs() {
-  const argv = process.argv.slice(2)[0].split(" ")
+  const argv = process.argv?.length > 2 ? process.argv.slice(2)[0].split(" ") : []
 
   var args = {}
 

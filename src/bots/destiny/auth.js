@@ -4,6 +4,8 @@ import { DestinyUserAuth } from '@/data/database'
 import keys from '@/data/keys'
 import { doManifestUpdate, setupManifest } from './manifest';
 
+const EXPIRATION_BUFFER = 15 // seconds
+
 var userApis = []
 
 export const setupDestinyUserAPIs = async () => {
@@ -19,9 +21,9 @@ export const setupDestinyUserAPIs = async () => {
     userAPI.setDisplayName(user.display_name)
 
     const accessCreatedAt = new Date(user.created_at), timeElapsedSinceUpdate = (new Date().getTime() - accessCreatedAt.getTime()) / 1000
-    var timeToTimeout = 3600
+    var timeToTimeout = user.expires_in - EXPIRATION_BUFFER
 
-    if(timeElapsedSinceUpdate >= user.expires_in){
+    if(timeElapsedSinceUpdate >= timeToTimeout){
       userAPI.refreshAccessToken()
       .then(data => {
         const curTime = new Date()

@@ -6,6 +6,8 @@ import { DEBUG } from "@/helper/args";
 
 export const keyLoc = DEBUG ? keys.spotify.dev : keys.spotify.prod
 
+const EXPIRATION_BUFFER = 15 // seconds
+
 var userApis = []
 
 export const setupUserAPIs = async () => {
@@ -22,9 +24,9 @@ export const setupUserAPIs = async () => {
     userAPI.setRefreshToken(user.refresh_token)
 
     const accessCreatedAt = new Date(user.created_at), timeElapsedSinceUpdate = (new Date().getTime() - accessCreatedAt.getTime()) / 1000
-    var timeToTimeout = 3600
+    var timeToTimeout = user.expires_in - EXPIRATION_BUFFER
 
-    if(timeElapsedSinceUpdate >= user.expires_in){
+    if(timeElapsedSinceUpdate >= timeToTimeout){
       userAPI.refreshAccessToken()
       .then(data => {
         const curTime = new Date()

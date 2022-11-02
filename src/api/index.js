@@ -1,6 +1,9 @@
 import express from 'express'
+import http from "http"
+import https from "https"
 import cors from "cors"
-//import path from "path"
+import path from "path"
+import fs from "fs"
 import fileUpload from "express-fileupload"
 import helmet from "helmet"
 
@@ -14,6 +17,7 @@ import { authRouter } from './auth'
 import { portfolioRouter } from './portfolio'
 import { twitchRouter } from './twitch'
 import { destinyRouter } from './destiny'
+import { mobileRouter } from './mobile'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -79,7 +83,18 @@ class ServerAPI {
   
     this.setupRoutes()
   
-    this.app.listen(port, () => APILogger.info(`API listening on port ${port}`))
+    const httpSrv = http.createServer(this.app)
+    
+    httpSrv.listen(port, '0.0.0.0', () => APILogger.info(`API listening on port ${port}`))
+
+    if(DEBUG) {
+      const httpsSrv = https.createServer({
+        key: fs.readFileSync("./certs/server.key"),
+        cert: fs.readFileSync("./certs/server.crt")
+      }, this.app)
+    
+      httpsSrv.listen((port+1), '0.0.0.0', () => APILogger.info(`API HTTPS listening on port ${port+1}`))
+    }
   }
 
   //Setup routes here for the API
@@ -102,8 +117,12 @@ class ServerAPI {
     // DESTINY AUTHENTICATION FOR API
     this.app.use('/destiny', destinyRouter)
 
+    // MOBILE APP ROUTES AND AUTH
+    if(DEBUG) this.app.use('/mobile', mobileRouter)
+
     // OTHER
-    this.app.use(express.static('public'));
+    this.app.use(express.static('public'))
+    if(DEBUG) this.app.use('/certs', express.static('certs'))
     this.app.get('*', (req, res, next) => res.status(404).send({ error: "Method does not exist!" }))
   }
 }
