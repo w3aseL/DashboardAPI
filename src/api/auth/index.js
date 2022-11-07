@@ -167,7 +167,7 @@ const verifyAccount = async (req, res, next) => {
 }
 
 const verifyPermission = async (perm, req, res, next) => {
-  if(checkForPermission(req.user.permissionLevel, "administrator") || checkForPermission(req.user.permissionLevel, perm))
+  if(checkForPermission(req.user.permissions, "administrator") || checkForPermission(req.user.permissions, perm))
     next()
   else
     res.status(401).send({ message: "You do not have the appropriate permissions to handle this command. Inquire with an administrator about accessing this permission!" })
@@ -231,7 +231,7 @@ const updatePassword = async (req, res, next) => {
 var authRouter = Router()
 
 // authRouter.get('/request-registration', startAccountProcess);
-// authRouter.post('/register', createAccount)
+authRouter.post('/register', createAccount)
 authRouter.post('/login', loginAccount)
 authRouter.post('/refresh', performAccessTokenRefresh)
 authRouter.post('/update-password', verifyAccount, updatePassword)

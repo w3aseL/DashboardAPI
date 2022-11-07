@@ -317,8 +317,7 @@ async function trackSession(sessionData) {
 
     const trackPlay = await SpotifyTrackPlay.create({ time_played: songPlayed.time_played })
     trackPlay.setSong(songModel)
-
-    session.addTrackPlay(trackPlay)
+    trackPlay.setSession(session)
   }
 }
 

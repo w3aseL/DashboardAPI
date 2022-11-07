@@ -8,7 +8,6 @@ import fileUpload from "express-fileupload"
 import helmet from "helmet"
 
 import { DEBUG, API_PORT } from '@/helper/args'
-
 import { APILogger, LogColors } from '@/helper/logger'
 
 import { spotifyRouter } from './spotify'
@@ -18,15 +17,35 @@ import { portfolioRouter } from './portfolio'
 import { twitchRouter } from './twitch'
 import { destinyRouter } from './destiny'
 import { mobileRouter } from './mobile'
+import { trackingRouter } from './tracking'
+import { createMetric } from '@/tracking/index'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
-const logger = (req, res, next) => {
+const logAndTrack = (req, res, next) => {
   const log = () => {
     APILogger.info(`${req.method} ${req.originalUrl} ${res.statusCode}`)
   }
 
-  res.on('finish', log)
+  const passTracking = () => {
+    if(req.method === "OPTIONS") return // ignore OPTIONS calls
+
+    // All data points for tracking
+    let data = {
+      timestamp: new Date(),
+      route: `${req.baseUrl}${req.path}`,
+      method: req.method,
+      statusCode: res.statusCode
+    }
+
+    setTimeout(() => createMetric(data), 0)
+  }
+
+  res.on('finish', () => {
+    log()
+    passTracking()
+  })
+
   next()
 }
 
@@ -70,7 +89,7 @@ class ServerAPI {
       createParentPath: true
     }))
 
-    this.app.use(logger)
+    this.app.use(logAndTrack)
     this.app.use(errorHandler)
 
     this.app.use(express.json());
@@ -119,6 +138,9 @@ class ServerAPI {
 
     // MOBILE APP ROUTES AND AUTH
     if(DEBUG) this.app.use('/mobile', mobileRouter)
+
+    // TRACKING DATA
+    if(DEBUG) this.app.use('/tracking', trackingRouter)
 
     // OTHER
     this.app.use(express.static('public'))
