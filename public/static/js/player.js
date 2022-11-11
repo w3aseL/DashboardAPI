@@ -1,5 +1,3 @@
-import { SpotifyLogger } from "../../../helper/logger"
-
 let state = { is_playing: false }
 
 const pullData = () => {
@@ -8,7 +6,7 @@ const pullData = () => {
   .then(data => {
     updateState(data)
   })
-  .catch(err => SpotifyLogger.error(err))
+  .catch(err => console.log(err))
 }
 const organizeArtists = (artists, useUrl=false) => {
   var str = ""

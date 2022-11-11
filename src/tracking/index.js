@@ -10,7 +10,7 @@ export const getAllMetrics = async (limit=100, offset=0, startDate, endDate) => 
   if(!endDate) endDate = Date.now()
 
   const records = await Metric.findAll({
-    attributes: [ 'route', 'method', 'statusCode', 'timestamp', 'hostname' ],
+    attributes: [ 'route', 'method', 'statusCode', 'timestamp' ],
     where: {
       timestamp: {
         [Op.between]: [startDate, endDate]

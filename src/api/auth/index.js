@@ -6,6 +6,7 @@ import { createTokenSet, refreshAccessToken, verifyAccessToken } from "@/auth/to
 import { generateRandomString, hashPassword, checkPassword } from "@/auth/hash"
 import { AccountLogger } from "@/helper/logger"
 import { checkForPermission, extractPermissions, encodePermissions } from "@/auth/perms"
+import { getUserEmailInfo, resendVerificationEmail, updateUserEmail } from "@/auth/email"
 
 var authData = { 
   passwords: []
@@ -114,6 +115,10 @@ const loginAccount = async (req, res, next) => {
     return
   }
 
+  if(!user.uuid) {
+    await user.update({ uuid: require('uuid').v4() })
+  }
+
   try {
     checkPassword(password, user.password, isCorrect => {
       if(!isCorrect) {
@@ -121,9 +126,9 @@ const loginAccount = async (req, res, next) => {
         return
       }
 
-      const tokens = createTokenSet(user.id)
+      const tokens = createTokenSet(user.uuid)
       
-      res.status(200).send({ tokens: { ...tokens }, user: { username: user.username, display_name: user.displayName } })
+      res.status(200).send({ tokens: { ...tokens }, user: { username: user.username, display_name: user.displayName, email: user.email } })
     })
   } catch(e) {
     res.status(500).send({ message: "An error occurred when checking the password provided!" })
@@ -144,7 +149,7 @@ const verifyAccount = async (req, res, next) => {
   try {
     const userId = verifyAccessToken(accessToken)
 
-    const user = await User.findOne({ where: { id: userId } })
+    const user = await User.findOne({ where: { uuid: userId } })
 
     if(!user) {
       res.status(401).send({ message: "The user provided with the token could not be found!" })
@@ -154,6 +159,7 @@ const verifyAccount = async (req, res, next) => {
     req.user = {
       username: user.username,
       id: user.id,
+      uuid: user.uuid,
       email: user.email ? user.email : undefined,
       permissions: user.permissionLevel
     }
@@ -213,7 +219,7 @@ const updatePassword = async (req, res, next) => {
       
       hashPassword(new_password, async encrypted_password => {
         try {
-          user.update({ password: encrypted_password })
+          User.update({ password: encrypted_password }, { where: { id } })
         } catch(e) {
           res.status(400).send({ message: "Unable to update the password for that user!", error: e })
           return
@@ -228,6 +234,46 @@ const updatePassword = async (req, res, next) => {
   }
 }
 
+const emailInfo = async (req, res, next) => {
+  const { uuid } = req.user
+
+  try {
+    const data = await getUserEmailInfo(uuid)
+
+    res.status(200).send({ ...data })
+  } catch(e) {
+    res.status(500).send({ message: "An error occurred when checking the password provided!" })
+    AccountLogger.error(e)
+  }
+}
+
+const updateEmail = async (req, res, next) => {
+  const { email } = req.body
+  const { uuid } = req.user
+
+  try {
+    const data = await updateUserEmail(uuid, email)
+    
+    res.status(200).send({ ...data, message: "Updated email for user. Verification email has been sent to that address." })
+  } catch(e) {
+    res.status(500).send({ message: "An error occurred when checking the password provided!" })
+    AccountLogger.error(e)
+  }
+}
+
+const resendVerification = async (req, res, next) => {
+  const { uuid } = req.user
+
+  try {
+    await resendVerificationEmail(uuid)
+
+    res.status(200).send({ message: "Resent verification email." })
+  } catch(e) {
+    res.status(500).send({ message: "An error occurred when checking the password provided!" })
+    AccountLogger.error(e)
+  }
+}
+
 var authRouter = Router()
 
 // authRouter.get('/request-registration', startAccountProcess);
@@ -236,5 +282,8 @@ authRouter.post('/login', loginAccount)
 authRouter.post('/refresh', performAccessTokenRefresh)
 authRouter.post('/update-password', verifyAccount, updatePassword)
 authRouter.get('/permissions', verifyAccount, getPermissions)
+authRouter.post('/update-email', verifyAccount, updateEmail)
+authRouter.get('/email', verifyAccount, emailInfo)
+authRouter.get('/resend-verify', verifyAccount, resendVerification)
 
 export { authRouter, verifyAccount, verifyPermission }

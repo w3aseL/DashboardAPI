@@ -1,9 +1,10 @@
 const fs = require('fs')
+const path = require('path')
 
 export default class JSONFile {
   constructor(directory, file) {
-    this.fileDir = process.cwd() + directory
-    this.fileLoc = this.fileDir + file
+    this.fileDir = path.join(process.cwd(), directory)
+    this.fileLoc = path.join(this.fileDir, file)
 
     if(!fs.existsSync(this.fileDir))
       fs.mkdirSync(this.fileDir, { recursive: true })
@@ -13,7 +14,7 @@ export default class JSONFile {
   }
 
   getData() {
-    return fs.readFileSync(this.fileLoc)
+    return JSON.parse(fs.readFileSync(this.fileLoc).toString())
   }
 
   updateData(jsonData) {

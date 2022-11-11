@@ -4,8 +4,11 @@ import keys from '@/data/keys'
 import { defaultUsername, getUserAPI } from './auth'
 import { SpotifyLogger, LogColors } from '@/helper/logger'
 import { SpotifySong, SpotifyArtist, SpotifyAlbum, SpotifySession, SpotifyTrackPlay } from "@/data/database"
+import JSONFile from "@/data/json"
 
-var state = {
+let persistStorage = new JSONFile("./storage", "tracking.json")
+
+const DEFAULT_STATE = {
   is_playing: false,
   current_song: null,
   previous_song: null,
@@ -23,9 +26,15 @@ var state = {
   }
 }
 
-var sessionSongState = {
+const DEFAULT_SESSION_STATE = {
   list: []
 }
+
+let { storedState, storedActiveState } = persistStorage.getData()
+
+var state = { ...DEFAULT_STATE, ...storedState }
+
+var sessionSongState = { ...DEFAULT_SESSION_STATE, ...storedActiveState }
 
 export function getPlaybackState() {
   var playbackState = { ...state }
@@ -86,6 +95,8 @@ export function checkSong() {
 }
 
 function updateStateFromPlaybackData(data) {
+  persistStorage.updateData({ storedState: state, storedActiveState: sessionSongState })
+
   if(data.is_playing === undefined) return
 
   if(data.is_playing != state.is_playing) {

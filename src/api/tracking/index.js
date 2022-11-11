@@ -20,8 +20,6 @@ const getMetrics = async (req, res, next) => {
 
 const trackingRouter = Router()
 
-trackingRouter.use(verifyAccount, (req, res, next) => verifyPermission("administrator", req, res, next))
-
-trackingRouter.get("/stats", getMetrics)
+trackingRouter.get("/stats", verifyAccount, (req, res, next) => verifyPermission("administrator", req, res, next), getMetrics)
 
 export { trackingRouter }
