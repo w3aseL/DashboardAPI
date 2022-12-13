@@ -1,5 +1,5 @@
 import { Metric } from "@/data/db/models/metric"
-import { Op } from "sequelize/dist"
+import { Op } from "sequelize"
 
 export const createMetric = async data => {
   await Metric.create(data)

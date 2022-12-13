@@ -1,4 +1,4 @@
-import { Op, Sequelize } from "sequelize/dist"
+import { Op, Sequelize } from "sequelize"
 import { SpotifySong, SpotifySession, SpotifyArtist, SpotifyAlbum, SpotifyTrackPlay } from "@/data/database"
 
 export const getArtistStatistics = async (offset=0, limit=15, songs=[], artists=[], albums=[], startDate, endDate) => {
