@@ -9,6 +9,7 @@ const Metric = db.define('Metric', {
     type: DataTypes.STRING,
     primaryKey: true,
     not_null: true,
+    unique: true,
     defaultValue: () => uuid()
   },
   route: {
@@ -33,6 +34,6 @@ const Metric = db.define('Metric', {
 })
 
 // Clean up once done testing
-Metric.sync({ force: DEBUG })
+Metric.sync({ force: DEBUG, alter: !DEBUG })
 
 export { Metric }

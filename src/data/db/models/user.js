@@ -12,7 +12,6 @@ const User = db.define('User', {
   uuid: {
     type: DataTypes.STRING,
     not_null: true,
-    unique: true,
     defaultValue: () => uuid()
   },
   displayName: {
