@@ -1,5 +1,5 @@
 import { DEBUG } from "./args";
-import { createLogger, format, transports } from "winston"
+import winston, { createLogger, format, transports } from "winston"
 
 //https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
 const colors = {
@@ -52,17 +52,23 @@ const mainLogger = createLogger({
     new transports.File({
       filename: 'logs/error.log',
       level: 'error'
-    }),
-    new transports.File({
-      filename: 'logs/exceptions.log',
-      handleExceptions: true
-    }),
-    new transports.File({
-      filename: 'logs/rejections.log',
-      handleRejections: true
     })
   ]
 })
+
+// exception loggers
+winston.add(
+  new transports.File({
+    filename: 'logs/exceptions.log',
+    handleExceptions: true
+  })
+)
+winston.add(
+  new transports.File({
+    filename: 'logs/rejections.log',
+    handleRejections: true
+  })
+)
 
 const apiLogger = mainLogger.child({ label: "API" })
 
