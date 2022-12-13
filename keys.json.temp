@@ -92,5 +92,9 @@
     "password": "dbpass",
     "database": "dbname",
     "dialect": "mysql"
+  },
+  "email": {
+    "username": "example@email.com",
+    "password": "emailpass"
   }
 }

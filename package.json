@@ -29,6 +29,7 @@
     "minimist": "^1.2.6",
     "mysql2": "^2.3.3",
     "node-cron": "^2.0.3",
+    "nodemailer": "^6.8.0",
     "request": "^2.88.0",
     "sequelize": "^6.15.0",
     "spotify-web-api-node": "^4.0.0",

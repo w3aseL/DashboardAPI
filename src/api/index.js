@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import http from "http"
 import https from "https"
 import cors from "cors"
@@ -19,6 +19,7 @@ import { destinyRouter } from './destiny'
 import { mobileRouter } from './mobile'
 import { trackingRouter } from './tracking'
 import { createMetric } from '@/tracking/index'
+import { sendEmail } from '@/helper/email'
 
 const formatTimeNum = timeNum => timeNum < 10 ? `0${timeNum}` : `${timeNum}`
 
@@ -81,6 +82,26 @@ const errorHandler = (err, req, res, next) => {
   res.status(500).send({ message: "An uncaught error occurred on the server side!" })
 }
 
+let testRouter = new Router()
+
+testRouter.post('/email', (req, res, next) => {
+  const { to } = req.body
+
+  console.log("sending email")
+
+  sendEmail({
+    to,
+    subject: "Test email!",
+    html: "<html><body><h4>SENDING DA EMAIL.</h4></body></html>"
+  })
+  .then(() => res.status(200).send({ message: 'ok!' }))
+  .catch(err => {
+    APILogger.error(err)
+
+    res.status(200).send({ msg: 'an error lol' })
+  })
+})
+
 class ServerAPI {
   constructor(port) {
     this.app = express()
@@ -141,6 +162,9 @@ class ServerAPI {
 
     // TRACKING DATA
     if(DEBUG) this.app.use('/tracking', trackingRouter)
+
+    // TESTING DATA
+    if(DEBUG) this.app.use('/test', testRouter)
 
     // OTHER
     this.app.use(express.static('public'))
