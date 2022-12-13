@@ -52,19 +52,15 @@ const mainLogger = createLogger({
     new transports.File({
       filename: 'logs/error.log',
       level: 'error'
+    }),
+    new transports.File({
+      filename: 'logs/exceptions.log',
+      handleExceptions: true
+    }),
+    new transports.File({
+      filename: 'logs/rejections.log',
+      handleRejections: true
     })
-  ],
-  exceptionHandlers: [
-    new transports.File({
-      filename: 'logs/exceptions.log'
-    }),
-    DEBUG && new transports.Console()
-  ],
-  rejectionHandlers: [
-    new transports.File({
-      filename: 'logs/rejections.log'
-    }),
-    DEBUG && new transports.Console()
   ]
 })
 
