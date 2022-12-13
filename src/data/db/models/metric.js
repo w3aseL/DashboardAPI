@@ -2,13 +2,13 @@ import { DataTypes } from "sequelize"
 import db from "../config/index"
 
 import { v4 as uuid } from "uuid"
+import { DEBUG } from "@/helper/args"
 
 const Metric = db.define('Metric', {
   id: {
     type: DataTypes.STRING,
     primaryKey: true,
     not_null: true,
-    unique: true,
     defaultValue: () => uuid()
   },
   route: {
@@ -33,6 +33,6 @@ const Metric = db.define('Metric', {
 })
 
 // Clean up once done testing
-Metric.sync({ force: true })
+Metric.sync({ force: DEBUG })
 
 export { Metric }
