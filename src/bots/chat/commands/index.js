@@ -131,6 +131,7 @@ addCommand("setinfo", async (args, user, client) => {
   }
 }, isMod)
 
+/*
 addCommand("destiny", async (args, user, client) => {
   if(args.length == 0) {
     client.say(DEFAULT_CHANNEL, `@${user.username}, "!destiny" requires more arguments!`)
@@ -143,16 +144,17 @@ addCommand("destiny", async (args, user, client) => {
         return
       }
       case "help": {
-        client.say(DEFAULT_CHANNEL, `@${user.username}: "!setinfo character|item [class|slot]"`)
+        client.say(DEFAULT_CHANNEL, `@${user.username}: "!destiny character|item [class|slot]"`)
         return
       }
       default: {
-        client.say(DEFAULT_CHANNEL, `@${user.username}, "!setinfo ${subCmd}" does not exist!`)
+        client.say(DEFAULT_CHANNEL, `@${user.username}, "!destiny ${subCmd}" does not exist!`)
         return
       }
     }
   }
 })
+*/
 
 /**
  * Process Command Message

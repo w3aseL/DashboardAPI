@@ -62,7 +62,7 @@ export const setupDestinyUserAPIs = async () => {
     setTimeout(() => updateUserAPI(index), Math.floor(timeToTimeout) * 1000)
   }
 
-  setTimeout(() => doManifestUpdate(), 10000)
+  // setTimeout(() => doManifestUpdate(), 10000)
 }
 
 const updateUserAPI = async index => {
