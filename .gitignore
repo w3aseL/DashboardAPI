@@ -6,3 +6,4 @@
 package-lock.json
 /logs
 /certs
+/build

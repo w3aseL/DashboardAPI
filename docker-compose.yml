@@ -13,3 +13,4 @@ services:
       - /storage:/storage
       - /keys.json:/keys.json
       - /keys:/keys
+      - /logs:/logs

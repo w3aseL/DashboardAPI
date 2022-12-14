@@ -1,4 +1,5 @@
 FROM node:17
+ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
@@ -8,7 +9,8 @@ RUN npm install
 
 # Copy all of the code and helpers
 COPY . .
+RUN npm run build
 
 EXPOSE 8080
 
-CMD [ "babel-node", "src/index.js", "backend-port=8080" ]
+CMD [ "node", "build/index.js", "backend-port=8080" ]
