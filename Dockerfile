@@ -1,10 +1,11 @@
 FROM node:17
+ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
 # Copy only the package.json and install binaries
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --production
 
 # Copy all of the code and helpers
 COPY . .
