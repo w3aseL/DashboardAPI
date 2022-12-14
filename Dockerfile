@@ -22,6 +22,4 @@ COPY --from=builder /app/public ./public
 
 EXPOSE 8080
 
-USER node
-
 CMD [ "node", "build/index.js", "backend-port=8080" ]
