@@ -60,12 +60,26 @@ const mainLogger = createLogger({
 winston.add(
   new transports.File({
     filename: 'logs/exceptions.log',
+    format: combine(
+      timestamp(),
+      format.json(),
+      printf(({level, message, label, timestamp}) => {
+        return `${timestamp} [${label}] ${level}: ${message}`;
+      })
+    ),
     handleExceptions: true
   })
 )
 winston.add(
   new transports.File({
     filename: 'logs/rejections.log',
+    format: combine(
+      timestamp(),
+      format.json(),
+      printf(({level, message, label, timestamp}) => {
+        return `${timestamp} [${label}] ${level}: ${message}`;
+      })
+    ),
     handleRejections: true
   })
 )
