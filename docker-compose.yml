@@ -10,7 +10,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - /storage:/storage
-      - /keys.json:/keys.json
-      - /keys:/keys
-      - /logs:/logs
+      - /storage:/storage:rw
+      - /keys.json:/keys.json:ro
+      - /keys:/keys:ro
+      - /logs:/logs:rw

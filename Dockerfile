@@ -1,4 +1,4 @@
-FROM node:17-alpine AS base
+FROM node:17-alpine
 
 WORKDIR /app
 
@@ -12,8 +12,6 @@ COPY . .
 RUN npm run build
 RUN npm prune --production
 
-RUN chown -R node.node /app
-
-USER node
+EXPOSE 8080
 
 CMD [ "node", "build/index.js", "backend-port=8080" ]
