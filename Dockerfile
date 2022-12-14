@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD [ "npm", "run", "prod" ]
+CMD [ "babel-node", "src/index.js", "backend-port=8080" ]
