@@ -1,5 +1,4 @@
 FROM node:17
-ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
