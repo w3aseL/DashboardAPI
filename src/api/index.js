@@ -143,7 +143,7 @@ class ServerAPI {
     this.app.use('/auth', authRouter)
 
     // TWITTER
-    this.app.use('/twitter', twitterRouter)
+    // this.app.use('/twitter', twitterRouter)
 
     // SPOTIFY TRACKING
     this.app.use('/spotify', spotifyRouter)

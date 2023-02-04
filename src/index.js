@@ -33,15 +33,15 @@ function init() {
     })
   }
 
-  cron.schedule('0 0 * * *', () => {
-    TwitterLogger.info('Generating follow report!')
-    followReport()
-  })
+  // cron.schedule('0 0 * * *', () => {
+  //   TwitterLogger.info('Generating follow report!')
+  //   followReport()
+  // })
   
-  //cron.schedule('5 */3 * * *', () => {
+  // cron.schedule('5 */3 * * *', () => {
   //  DestinyLogger.info('Checking Destiny manifest for updates!')
   //  doManifestUpdate()
-  //})
+  // })
 
   setTimeout(() => {
     SpotifyLogger.info("Scheduled song tracking task!")

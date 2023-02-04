@@ -107,7 +107,10 @@ class TwodderBot {
 
 const keyLoc = DEBUG ? keys.twodder.dev : keys.twodder.prod
 
-const botTwit = new TwodderBot(keyLoc.bot)
-const mainTwit = new TwodderBot(keyLoc.main)
+// const botTwit = new TwodderBot(keyLoc.bot)
+// const mainTwit = new TwodderBot(keyLoc.main)
+
+const botTwit = null
+const mainTwit = null
 
 export { botTwit, mainTwit }
